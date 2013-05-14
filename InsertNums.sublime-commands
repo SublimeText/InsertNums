@@ -1,0 +1,6 @@
+[
+	{
+		"caption": "InsertNums",
+		"command": "prompt_insert_nums"
+	}
+]
