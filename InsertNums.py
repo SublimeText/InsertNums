@@ -1,8 +1,15 @@
-import sublime, sublime_plugin
+import sublime_plugin
+
 
 class PromptInsertNumsCommand(sublime_plugin.WindowCommand):
     def run(self):
-        self.window.show_input_panel('Enter a starting number/character, step and padding.', '1 1 0', self.insertNums, self.insertNums, None)
+        self.window.show_input_panel(
+            'Enter a starting number/character, step and padding.',
+            '1 1 0',
+            self.insertNums,
+            self.insertNums,
+            None
+        )
         pass
 
     def insertNums(self, text):
@@ -10,9 +17,13 @@ class PromptInsertNumsCommand(sublime_plugin.WindowCommand):
             (current, step, padding) = map(str, text.split(" "))
 
             if self.window.active_view():
-                self.window.active_view().run_command("insert_nums", {"current": current, "step": step, "padding": padding } )
+                self.window.active_view().run_command(
+                    "insert_nums",
+                    {"current": current, "step": step, "padding": padding}
+                )
         except ValueError:
             pass
+
 
 class InsertNumsCommand(sublime_plugin.TextCommand):
     digits = '0123456789'
@@ -25,11 +36,13 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
         elif current in self.alpha:
             current = self.decode(current)
+
             def tick(counter):
                 return self.encode(current + counter)
 
         elif current in self.alpha.upper():
             current = self.decode(current.lower())
+
             def tick(counter):
                 return self.encode(current + counter).upper()
 
