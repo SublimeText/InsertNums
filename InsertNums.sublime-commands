@@ -1,6 +1,6 @@
 [
 	{
-		"caption": "InsertNums",
+		"caption": "Insert Nums",
 		"command": "prompt_insert_nums"
 	}
 ]
