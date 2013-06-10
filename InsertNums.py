@@ -21,12 +21,12 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
     def run(self, edit, current, step, padding):
         if current in self.digits:
             def tick(counter):
-                return str('%0*d' % (int(padding), int(current) + counter))
+                return str('%0*d' % (int(padding) + 1, int(current) + counter))
                 
         elif current[0] == 'x':
             current = int(current[1:])
             def tick(counter):
-                return str('%0*x' % (int(padding), int(current) + counter))
+                return str('%0*x' % (int(padding) + 1, int(current) + counter))
 
         elif current in self.alpha:
             current = self.decode(current)
