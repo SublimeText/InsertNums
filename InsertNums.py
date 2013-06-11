@@ -68,37 +68,40 @@ def get_rexexps(*ret):
                               (?P<wrap> w)? )? $
     """
 
-    # An ordereddict would be useful here, but Py2.6 ...
+    # Our most important variable
     repository = {}
-    repository_list = []
+
     # Parse the stuff
     split = repository_source.split("::=  ")
-    while len(split) > 1:
-        # Do stuff backwards
-        # Alternative idea: use a temporary "key" variable for the next section
-        pattern = split[-1]
-        before_pattern, key = split[-2].rsplit("\n", 1)
-        if not key:
-            key = before_pattern
+    key, i = "", 0
+    while i < len(split):
+        # Split at last line break
+        try:
+            pattern, next_key = split[i].rsplit("\n", 1)
+        except ValueError:
+            # First key and no line break at the beginning
+            next_key = split[i]
 
-        # Remove comments and multiple whitespaces and wrap in non-capturing group
-        pattern = "(?:%s)" % strip_line_spaces(re.sub(r"(?<!\\)#.*$", '', pattern))
+        if key:
+            # Remove comments and multiple whitespaces and wrap in non-capturing group
+            pattern = "(?:%s)" % strip_line_spaces(re.sub(r"(?m)\s#\s.*$", '', pattern))
 
-        repository_list.append((key.strip(), pattern))
+            # Now, replace format strings (requires correct order)
+            repository[key] = pattern.format(**repository)
+
         # Prepare for next step
-        split[-2] = before_pattern
-        del split[-1]
+        key = next_key.strip()
+        i += 1
 
-    # Now, replace format strings in order (of appearance)
-    for i, (k, v) in enumerate(reversed(repository_list)):
-        repository[k] = v.format(**repository)
-
-    return tuple(repository[k] for k in ret)
+    if ret:
+        # Return the values asked for, in order
+        return tuple(repository[k] for k in ret)
+    else:
+        return repository
 
 
 class InsertNumsCommand(sublime_plugin.TextCommand):
-    alpha = 'abcdefghijklmnopqrstuvwxyz'
-
+    # Regular expressions for format syntax
     insertnum, insertalpha = get_rexexps("insertnum", "insertalpha")
 
     def run(self, edit, format=''):
@@ -110,14 +113,9 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         if not m:
             return self.status("Format string is invalid: %s" % format)
         m = m.groupdict()
-        # print(m)
-
-        # Booleans interesting for alpha insertions
-        ALPHA = 'wrap' in m
-        # UPPER = ALPHA and m['start'][0].isupper()
-        # WRAP = ALPHA and bool(m['wrap'])
 
         # Read values
+        ALPHA = 'wrap' in m
         start  = ALPHA and m['start'] or int_or_float(m['start'])
         step   = int_or_float(m['step']) if m['step'] else 1
         format = m['format']
@@ -135,28 +133,45 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
                 else:
                     replace = str(value)
                 self.view.replace(edit, region, replace)
+
                 value += step
         else:
-            # TODO
-            pass
+            UPPER = ALPHA and m['start'][0].isupper()
+            WRAP = ALPHA and bool(m['wrap'])
 
-    def encode(self, num):
+            # Always calculate with lower alphas and 0-based integers here
+            lenght = len(start) if WRAP else 0
+            value = self.alpha_to_num(start.lower())
+
+            for region in self.view.sel():
+                replace = self.num_to_alpha(value, lenght)
+                if UPPER:
+                    replace = replace.upper()
+                if format:
+                    replace = "{value:{format}}".format(value=replace, format=format)
+                self.view.replace(edit, region, replace)
+
+                value += step
+
+    def num_to_alpha(self, num, lenght=0):
         res = ''
+
+        if lenght:
+            num = (num - 1) % (26 ** lenght) + 1
 
         while num > 0:
             num -= 1
-            if num >= 0:
-                res += self.alpha[int(num) % 26]
-                num /= 26
+            res = chr(97 + (num % 26)) + res  # ord("a") == 97
+            num //= 26
 
         return res
 
-    def decode(self, str):
+    def alpha_to_num(self, alpha):
         res = 0
 
-        for i in str:
+        for c in alpha:
             res *= 26
-            res += self.alpha.index(i) + 1
+            res += ord(c) - 96  # ord("a") == 97
 
         return res
 
