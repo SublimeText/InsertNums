@@ -46,7 +46,7 @@ def get_rexexps(*ret):
 
         # float and numeric
         pointfloat    ::=  {integer}? \. \d+ | {integer} \.
-        exponentfloat ::=  (?:{integer} | {pointfloat}) [eE] [+-] \d+
+        exponentfloat ::=  (?:{integer} | {pointfloat}) [eE] [+-]? \d+
         float         ::=  {pointfloat} | {exponentfloat}
         numeric       ::=  {integer} | {float}
         signednum     ::=  [+-]? {numeric}
