@@ -1,29 +1,31 @@
-insert_spec  ::=  insertnum | insertalpha
+# insert_spec   ::=  insertnum | insertalpha
 
-insertnum    ::=  numeric[:numeric][~format]
+insertnum     ::=  signednum[:signednum][~format] ["!"]
 
-numeric      ::=  integer | float
+signednum     ::=  ["+" | "-"] (integer | float)
+numeric       ::=  integer | float
 # essentially Python's "str.format" syntax
-format       ::=  [[fill]align][sign][#][0][width][.precision][type]
-fill         ::=  <a character other than '}'>
-align        ::=  "<" | ">" | "=" | "^"
-sign         ::=  "+" | "-" | " "
-width        ::=  integer
-precision    ::=  integer
-type         ::=  "b" | "c" | "d" | "e" | "E" | "f" | "F" | "g" | "G" | "n" | "o" | "x" | "X" | "%"
+format        ::=  [[fill]align][sign][#][0][width][.precision][type]
+fill          ::=  <a character other than '}'>
+align         ::=  "<" | ">" | "=" | "^"
+sign          ::=  "+" | "-" | " "
+width         ::=  integer
+precision     ::=  integer
+type          ::=  "b" | "c" | "d" | "e" | "E" | "f" | "F" | "g" | "G" | "n" | "o" | "x" | "X" | "%"
 
-insertalpha  ::=  alphastart[:integer][~[alphaformat]["w"]]
+insertalpha   ::=  alphastart[:signedint][~[alphaformat] ["w"]] ["!"]
 
-alphastart   ::=  alphalower+ | alphaupper+
-alphalower   ::=  "a"..."z"
-alphaupper   ::=  "A"..."Z"
-alphaformat  ::=  [[fill]align][width]
+alphastart    ::=  alphalower+ | alphaupper+
+alphalower    ::=  "a"..."z"
+alphaupper    ::=  "A"..."Z"
+alphaformat   ::=  [[fill]align][width]
 
 ####################
 
-integer      ::=  nonzerodigit digit* | "0"
-nonzerodigit ::=  "1"..."9"
-digit        ::=  "0"..."9"
+signedint     ::=  ["+" | "-"] {integer}
+integer       ::=  nonzerodigit digit* | "0"
+nonzerodigit  ::=  "1"..."9"
+digit         ::=  "0"..."9"
 
 float         ::=  pointfloat | exponentfloat
 pointfloat    ::=  [intpart] fraction | intpart "."
