@@ -9,8 +9,9 @@ if int(sublime.version()) > 3000:
 
 module_name = "InsertNums"
 
-# TODO: option to do stuff backwards (yet another "option")
-# TODO: expression for "step" (e.g. "_**2")
+
+# TODO: expressions for "step" (e.g. "_**2")
+# TODO: expressions only for the value, independant of the actual "step"
 
 
 def strip_line_spaces(string):
@@ -65,12 +66,14 @@ def get_rexexps(*ret):
         # finals
         insertnum     ::=  ^ (?P<start> {signednum})
                            (: (?P<step> {signednum}) )?
-                           (~ (?P<format> {format}) )? $
+                           (~ (?P<format> {format}) )?
+                           (?P<reverse> !)? $
 
         insertalpha   ::=  ^ (?P<start> {alphastart})
                            (: (?P<step> {signedint}) )?
                            (~ (?P<format> {alphaformat})
-                              (?P<wrap> w)? )? $
+                              (?P<wrap> w)? )?
+                           (?P<reverse> !)? $
     """
 
     # Our most important variable
@@ -125,6 +128,11 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         step   = int_or_float(m['step']) if m['step'] else 1
         format = m['format']
 
+        # Reverse the regions if requested
+        selections = [reg for reg in self.view.sel()]
+        if m['reverse']:
+            selections.reverse()
+
         # Do the stuff
         if not ALPHA:
             value = start
@@ -133,7 +141,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
                     and isinstance(value, int)):
                 value = float(value)
 
-            for region in self.view.sel():
+            for region in selections:
                 if format:
                     replace = "{value:{format}}".format(value=value, format=format)
                 else:
@@ -149,7 +157,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
             lenght = len(start) if WRAP else 0
             value = self.alpha_to_num(start.lower())
 
-            for region in self.view.sel():
+            for region in selections:
                 replace = self.num_to_alpha(value, lenght)
                 if UPPER:
                     replace = replace.upper()

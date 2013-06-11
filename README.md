@@ -52,7 +52,7 @@ For more options see the following [Advanced usage](#advaced-usage) section.
 
 ### Advanced usage
 
-The complete syntax is: `<start>:<step>~<format>`
+The complete syntax is: `<start>:<step>~<format><reverse>`
 
 Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
 
@@ -73,6 +73,10 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
     + *with numbers*: A fomat string in Python's [Format Specific Mini-Language][fmtlang] (with small and unimportant adjustments for allowed types).
 
     + *with alphabet*: Similar to with number but a stripped-down version only for strings. This only includes the `[[fill]align][width]` syntax and additionally accepts a `w` character at the end (see above).
+
+- **reverse** (optional)
+
+    + Must be `!` and results in the regions being filled in reversed order.
 
 
 ## Examples
@@ -140,16 +144,16 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
     0.2120
     ```
 
-- `8:8~#010x`
+- `8:8~#010x!`
 
     ```
-    0x00000008
-    0x00000010
-    0x00000018
-    0x00000020
-    0x00000028
-    0x00000030
     0x00000038
+    0x00000030
+    0x00000028
+    0x00000020
+    0x00000018
+    0x00000010
+    0x00000008
     ```
 
 - `z:25~w` or `z:-1~w`
