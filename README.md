@@ -21,7 +21,7 @@ For every selected region the inserted number (starting with *start*) will then 
 
 ### Usage with numbers
 
-InsertNums supports both, integers and floating numbers, as *start* and *step* values respectively. This means you can use `1:.4` on 4 selections and get this:
+InsertNums supports both, integers and floating numbers, as *start* and *step* values respectively, also negative numbers. This means you can use `1:.4` on 4 selections and get this:
 
     1.0
     1.4
@@ -58,15 +58,15 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
 
 - **start**
 
-    + *with numbers*: A *[decimalinteger]* or *[floatnumber]* according to Python's syntax specifications.
+    + *with numbers*: A *[decimalinteger]* or *[floatnumber]* according to Python's syntax specifications with an optional leading sign (`-` or `+`).
 
     + *with alphabet*: A sequence of either lower- or uppercase ASCII characters from the alphabet (`a` to `z` and `A` to `Z`).
 
 - **step** (optional)
 
-    + *with numbers*: A *[decimalinteger]* or *[floatnumber]* according to Python's syntax specifications.
+    + *with numbers*: A *[decimalinteger]* or *[floatnumber]* according to Python's syntax specifications with an optional leading sign (`-` or `+`).
 
-    + *with alphabet*: A *[decimalinteger]*.
+    + *with alphabet*: A *[decimalinteger]* with an optional leading sign (`-` or `+`).
 
 - **format** (optional)
 
@@ -86,6 +86,19 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
     4
     5
     6
+    ```
+
+- `-10:2~3`
+
+    ```
+    -10
+     -8
+     -6
+     -4
+     -2
+      0
+      2
+      4
     ```
 
 - `11:11~+4`
@@ -139,7 +152,7 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
     0x00000038
     ```
 
-- `z:25~w`
+- `z:25~w` or `z:-1~w`
 
     ```
     z

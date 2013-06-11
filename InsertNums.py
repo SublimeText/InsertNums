@@ -9,6 +9,9 @@ if int(sublime.version()) > 3000:
 
 module_name = "InsertNums"
 
+# TODO: option to do stuff backwards (yet another "option")
+# TODO: expression for "step" (e.g. "_**2")
+
 
 def strip_line_spaces(string):
     return "\n".join([line.strip() for line in string.strip().split("\n")])
@@ -24,7 +27,7 @@ def int_or_float(value):
 class PromptInsertNumsCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         self.view.window().show_input_panel(
-            'Enter a Format string like "1:1".',
+            "Enter a Format string like '1:1':",
             '',
             lambda x: self.view.run_command("insert_nums", {"format": x}),
             None,  # TODO: Preview
@@ -38,12 +41,14 @@ def get_rexexps(*ret):
     repository_source = r"""
         # base
         integer       ::=  [1-9]\d* | 0
+        signedint     ::=  [+-]? {integer}
 
         # float and numeric
         pointfloat    ::=  {integer}? \. \d+ | {integer} \.
         exponentfloat ::=  (?:{integer} | {pointfloat}) [eE] [+-] \d+
         float         ::=  {pointfloat} | {exponentfloat}
         numeric       ::=  {integer} | {float}
+        signednum     ::=  [+-]? {numeric}
 
         # (format) specific
         format        ::=  ([^}}]?[<>=^])?   # (fill)align
@@ -58,12 +63,12 @@ def get_rexexps(*ret):
                            {integer}?        # width
 
         # finals
-        insertnum     ::=  ^ (?P<start> {numeric})
-                           (: (?P<step> {numeric}) )?
+        insertnum     ::=  ^ (?P<start> {signednum})
+                           (: (?P<step> {signednum}) )?
                            (~ (?P<format> {format}) )? $
 
         insertalpha   ::=  ^ (?P<start> {alphastart})
-                           (: (?P<step> {integer}) )?
+                           (: (?P<step> {signedint}) )?
                            (~ (?P<format> {alphaformat})
                               (?P<wrap> w)? )? $
     """
