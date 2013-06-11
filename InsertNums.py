@@ -124,7 +124,8 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         if not ALPHA:
             value = start
             # Convert to float if precision in format string
-            if format and '.' in format and isinstance(value, int):
+            if ((format and '.' in format or isinstance(step, float))
+                    and isinstance(value, int)):
                 value = float(value)
 
             for region in self.view.sel():
