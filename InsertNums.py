@@ -26,11 +26,10 @@ class PromptInsertNumsCommand(sublime_plugin.WindowCommand):
 
 
 class InsertNumsCommand(sublime_plugin.TextCommand):
-    digits = '0123456789'
     alpha = 'abcdefghijklmnopqrstuvwxyz'
 
     def run(self, edit, current, step, padding):
-        if current in self.digits:
+        if current.isdigit():
             def tick(counter):
                 return str('%0*d' % (int(padding), int(current) + counter))
 
