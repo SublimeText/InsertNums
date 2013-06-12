@@ -1,8 +1,15 @@
-import sublime, sublime_plugin
+import sublime_plugin
+
 
 class PromptInsertNumsCommand(sublime_plugin.WindowCommand):
     def run(self):
-        self.window.show_input_panel('Enter a starting number/character, step and padding.', '1 1 0', self.insertNums, self.insertNums, None)
+        self.window.show_input_panel(
+            'Enter a starting number/character, step and padding.',
+            '1 1 0',
+            self.insertNums,
+            self.insertNums,
+            None
+        )
         pass
 
     def insertNums(self, text):
@@ -10,9 +17,13 @@ class PromptInsertNumsCommand(sublime_plugin.WindowCommand):
             (current, step, padding) = map(str, text.split(" "))
 
             if self.window.active_view():
-                self.window.active_view().run_command("insert_nums", {"current": current, "step": step, "padding": padding } )
+                self.window.active_view().run_command(
+                    "insert_nums",
+                    {"current": current, "step": step, "padding": padding}
+                )
         except ValueError:
             pass
+
 
 class InsertNumsCommand(sublime_plugin.TextCommand):
     digits = '0123456789'
@@ -21,20 +32,17 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
     def run(self, edit, current, step, padding):
         if current in self.digits:
             def tick(counter):
-                return str('%0*d' % (int(padding) + 1, int(current) + counter))
-                
-        elif current[0] == 'x':
-            current = int(current[1:])
-            def tick(counter):
-                return str('%0*x' % (int(padding) + 1, int(current) + counter))
+                return str('%0*d' % (int(padding), int(current) + counter))
 
         elif current in self.alpha:
             current = self.decode(current)
+
             def tick(counter):
                 return self.encode(current + counter)
 
         elif current in self.alpha.upper():
             current = self.decode(current.lower())
+
             def tick(counter):
                 return self.encode(current + counter).upper()
 
