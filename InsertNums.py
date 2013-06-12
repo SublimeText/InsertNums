@@ -45,7 +45,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
             def tick(counter):
                 return self.encode(current + counter).upper()
 
-        elif current[0] === 'x':
+        elif current[0] == 'x':
             current = int(current[1:])
             
             def tick(counter):
