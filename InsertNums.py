@@ -128,10 +128,12 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         step   = int_or_float(m['step']) if m['step'] else 1
         format = m['format']
 
-        # Reverse the regions if requested
-        selections = [reg for reg in self.view.sel()]
+        # Reverse the regions if requested | by default, this works like an iterator
+        selections = self.view.sel()
         if m['reverse']:
-            selections.reverse()
+            # Construct a real list and reverse that, won't affect the regions
+            # since we're going backwards
+            selections = reversed(reg for reg in selections)
 
         # Do the stuff
         if not ALPHA:
