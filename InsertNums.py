@@ -47,6 +47,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
         elif current[0] === 'x':
             current = int(current[1:])
+            
             def tick(counter):
                 return str('%0*x' % (int(padding) + 1, int(current) + counter))
 
