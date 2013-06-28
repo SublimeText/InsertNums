@@ -51,6 +51,16 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
             def tick(counter):
                 return str('%0*x' % (int(padding) + 1, int(current) + counter))
 
+        elif current[0] == '0' and current[1] == 'x':
+            current = int(current[2:])
+            padding = int(padding)
+
+            def tick(counter):
+                if(step == "<<"):
+                    return str("0x%d" % int(counter + (current << padding)))
+                elif(step == ">>"):
+                    return str("0x%d" % int(counter + (current >> padding)))
+
         else:
             return
 
@@ -58,7 +68,11 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         counter = 0
         for region in self.view.sel():
             self.view.replace(edit, region, tick(counter))
-            counter += int(step)
+            if(step == "<<" or step == ">>"):
+                counter += 1
+            else:
+                counter += int(step)
+
 
     def encode(self, num):
         res = ''
