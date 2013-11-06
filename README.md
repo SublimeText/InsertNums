@@ -185,7 +185,7 @@ And many more ...
 ## Contributors
 - [James Brooks](http://james.brooks.so), [@jbrooksuk](http://twitter.com/jbrooksuk)
 - Marco Novaro, [@MarcoNovaro](https://github.com/MarcoNovaro)
-- Oleg Geier, [@jbrooksuk](http://twitter.com/relikd)
+- Oleg Geier, [@relikd](http://twitter.com/relikd)
 
 # License
 
