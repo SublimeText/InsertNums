@@ -53,7 +53,7 @@ And we can still make use of the step value, `x9 3 0` will generate:
 ## Contributors
 - [James Brooks](http://james.brooks.so), [@jbrooksuk](http://twitter.com/jbrooksuk)
 - Marco Novaro, [@MarcoNovaro](https://github.com/MarcoNovaro)
-- Oleg Geier, [@jbrooksuk](http://twitter.com/relikd)
+- Oleg Geier, [@relikd](http://twitter.com/relikd)
 
 # License
 MIT - [http://jbrooksuk.mit-license.org](http://jbrooksuk.mit-license.org)
