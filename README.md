@@ -22,6 +22,8 @@ By default, InsertNums will use `1 1 0` as the default settings. These values re
 - Step - how much to increment each iteration by
 - Padding - will prepend a `0` to the number in the iteration.
 
+Some times you may want to use InsertNums without the automatic insertion. You can use <kbd>Shift</kbd> as a modifier key to the same shortcuts above to prevent the insertion, just hit enter to confirm your pattern.
+
 ### Generating the alphabet
 InsertNums can also insert the alphabet! Just use `a 1 1` as your values, or change `a` to whatever character you'd like to start from! One of the great side effects of introducing alpha sequences is that you can generate seemingly (but definitely not) random sequences. For instance, using `a 12345 0` will generate the following across three selections:
 
