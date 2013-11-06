@@ -1,1 +1,4 @@
-[{ "keys": ["ctrl+alt+n"], "command": "prompt_insert_nums" }]
+[
+	{ "keys": ["ctrl+alt+n"], "command": "prompt_insert_nums" }
+	{ "keys": ["ctrl+shift+alt+n"], "command": "prompt_insert_nums", "args": { "automatic": false } }
+]

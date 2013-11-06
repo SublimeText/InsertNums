@@ -2,12 +2,12 @@ import sublime_plugin
 
 
 class PromptInsertNumsCommand(sublime_plugin.WindowCommand):
-    def run(self):
+    def run(self, automatic = True):
         self.window.show_input_panel(
             'Enter a starting number/character, step and padding.',
             '1 1 0',
             self.insertNums,
-            self.insertNums,
+            self.insertNums if automatic else None,
             None
         )
         pass
