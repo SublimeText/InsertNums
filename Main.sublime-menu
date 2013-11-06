@@ -1,5 +1,16 @@
 [
     {
+        "id": "tools",
+        "children":
+        [
+            {
+                "caption": "InsertNums",
+                "mnemonic": "N",
+                "command": "prompt_insert_nums"
+            }
+        ]
+    },
+    {
         "caption": "Preferences",
         "mnemonic": "n",
         "id": "preferences",
