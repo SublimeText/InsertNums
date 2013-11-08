@@ -183,9 +183,10 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
 And many more ...
 
 ## Contributors
-- [James Brooks](http://james.brooks.so), [@jbrooksuk](http://twitter.com/jbrooksuk)
+- [James Brooks](http://james.brooks.so), [@jbrooksuk](https://twitter.com/jbrooksuk)
 - Marco Novaro, [@MarcoNovaro](https://github.com/MarcoNovaro)
-- Oleg Geier, [@relikd](http://twitter.com/relikd)
+- Oleg Geier, [@relikd](https://twitter.com/relikd)
+- Arthur Comben, [@anthillape](https://twitter.com/anthillape)
 
 # License
 
