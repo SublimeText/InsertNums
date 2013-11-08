@@ -51,9 +51,10 @@ And we can still make use of the step value, `x9 3 0` will generate:
 	12
 
 ## Contributors
-- [James Brooks](http://james.brooks.so), [@jbrooksuk](http://twitter.com/jbrooksuk)
+- [James Brooks](http://james.brooks.so), [@jbrooksuk](https://twitter.com/jbrooksuk)
 - Marco Novaro, [@MarcoNovaro](https://github.com/MarcoNovaro)
-- Oleg Geier, [@relikd](http://twitter.com/relikd)
+- Oleg Geier, [@relikd](https://twitter.com/relikd)
+- Arthur Comben, [@anthillape](https://twitter.com/anthillape)
 
 # License
 MIT - [http://jbrooksuk.mit-license.org](http://jbrooksuk.mit-license.org)
