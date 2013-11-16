@@ -7,12 +7,14 @@ import sublime_plugin
 if int(sublime.version()) > 3000:
     basestring = str
 
-module_name = "InsertNums"
+module_name = "Insert Nums"
 
 
 # TODO: expressions for "step" (e.g. "_**2")
 # TODO: expressions only for the value, independant of the actual "step"
 
+
+# Utility functions ####################
 
 def strip_line_spaces(string):
     return "\n".join([line.strip() for line in string.strip().split("\n")])
@@ -23,17 +25,6 @@ def int_or_float(value):
         return int(value)
     except ValueError:
         return float(value)
-
-
-class PromptInsertNumsCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
-        self.view.window().show_input_panel(
-            "Enter a Format string like '1:1':",
-            '',
-            lambda x: self.view.run_command("insert_nums", {"format": x}),
-            None,  # TODO: Preview
-            None
-        )
 
 
 def get_rexexps(*ret):
@@ -81,14 +72,14 @@ def get_rexexps(*ret):
 
     # Parse the stuff
     split = repository_source.split("::=  ")
-    key, i = "", 0
-    while i < len(split):
+    key = ""
+    for next_key in split:
         # Split at last line break
         try:
-            pattern, next_key = split[i].rsplit("\n", 1)
+            pattern, next_key = next_key.rsplit("\n", 1)
         except ValueError:
             # First key and no line break at the beginning
-            next_key = split[i]
+            pass
 
         if key:
             # Remove comments and multiple whitespaces and wrap in non-capturing group
@@ -99,13 +90,25 @@ def get_rexexps(*ret):
 
         # Prepare for next step
         key = next_key.strip()
-        i += 1
 
     if ret:
         # Return the values asked for, in order
         return tuple(repository[k] for k in ret)
     else:
         return repository
+
+
+# The Commands #########################
+
+class PromptInsertNumsCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        self.view.window().show_input_panel(
+            "Enter a Format string like '1:1':",
+            '',
+            lambda x: self.view.run_command("insert_nums", {"format": x}),
+            None,  # TODO: Preview
+            None
+        )
 
 
 class InsertNumsCommand(sublime_plugin.TextCommand):
@@ -123,7 +126,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         m = m.groupdict()
 
         # Read values
-        ALPHA = 'wrap' in m
+        ALPHA  = 'wrap' in m
         start  = ALPHA and m['start'] or int_or_float(m['start'])
         step   = int_or_float(m['step']) if m['step'] else 1
         format = m['format']
@@ -156,11 +159,11 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
             WRAP = ALPHA and bool(m['wrap'])
 
             # Always calculate with lower alphas and 0-based integers here
-            lenght = len(start) if WRAP else 0
+            length = len(start) if WRAP else 0
             value = self.alpha_to_num(start.lower())
 
             for region in selections:
-                replace = self.num_to_alpha(value, lenght)
+                replace = self.num_to_alpha(value, length)
                 if UPPER:
                     replace = replace.upper()
                 if format:
@@ -169,11 +172,11 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
                 value += step
 
-    def num_to_alpha(self, num, lenght=0):
+    def num_to_alpha(self, num, length=0):
         res = ''
 
-        if lenght:
-            num = (num - 1) % (26 ** lenght) + 1
+        if length:
+            num = (num - 1) % (26 ** length) + 1
 
         while num > 0:
             num -= 1
