@@ -136,7 +136,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         start  = ALPHA and m['start'] or int_or_float(m['start']) or 1
         step   = int_or_float(m['step']) if m['step'] else 1
         format = m['format']
-        expr   = m['expr']
+        expr   = not ALPHA and m['expr']
 
         # Reverse the regions if requested | by default, this works like an iterator
         selections = self.view.sel()
