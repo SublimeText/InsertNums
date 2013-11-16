@@ -1,5 +1,9 @@
 import re
 
+# Modules for expression evaluation
+import math
+import random
+
 import sublime
 import sublime_plugin
 
@@ -54,10 +58,14 @@ def get_rexexps(*ret):
         alphaformat   ::=  ([^}}]?[<>=^])?   # (fill)align
                            {integer}?        # width
 
+        # generic python expression (keep it simple)
+        expr          ::=  [^!]*
+
         # finals
         insertnum     ::=  ^ (?P<start> {signednum})
                            (: (?P<step> {signednum}) )?
                            (~ (?P<format> {format}) )?
+                           (:: (?P<expr> {expr}) )?
                            (?P<reverse> !)? $
 
         insertalpha   ::=  ^ (?P<start> {alphastart})
@@ -130,6 +138,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         start  = ALPHA and m['start'] or int_or_float(m['start'])
         step   = int_or_float(m['step']) if m['step'] else 1
         format = m['format']
+        expr   = m['expr']
 
         # Reverse the regions if requested | by default, this works like an iterator
         selections = self.view.sel()
@@ -141,16 +150,39 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         # Do the stuff
         if not ALPHA:
             value = start
+
             # Convert to float if precision in format string
             if ((format and '.' in format or isinstance(step, float))
                     and isinstance(value, int)):
                 value = float(value)
 
+            # Save the previously evaluated value for `p` (defaults to 0)
+            eval_value = 0
+
             for region in selections:
-                if format:
-                    replace = "{value:{format}}".format(value=value, format=format)
+                # Evaluate the expression, if given
+                if expr:
+                    # Build environment
+                    env = dict(_=value, i=value, p=eval_value, s=step,
+                               # Some useful modules
+                               math=math, random=random)
+                    try:
+                        eval_value = eval(expr, env)
+                    except Exception as e:
+                        sublime.error_message(
+                            "[%s] Invalid Expression\n\n"
+                            "The expression `%s` raised an exception:\n\n"
+                            "%r" % (module_name, expr, e)
+                        )
+                        return
                 else:
-                    replace = str(value)
+                    eval_value = value
+
+                # Format
+                if format:
+                    replace = "{value:{format}}".format(value=eval_value, format=format)
+                else:
+                    replace = str(eval_value)
                 self.view.replace(edit, region, replace)
 
                 value += step

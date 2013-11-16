@@ -1,9 +1,11 @@
 # insert_spec   ::=  insertnum | insertalpha
 
-insertnum     ::=  signednum[:signednum][~format] ["!"]
+insertnum     ::=  signednum[:signednum][~format][::expr] ["!"]
 
 signednum     ::=  ["+" | "-"] (integer | float)
 numeric       ::=  integer | float
+expr          ::=  <a character other than '!'>*
+
 # essentially Python's "str.format" syntax
 format        ::=  [[fill]align][sign][#][0][width][.precision][type]
 fill          ::=  <a character other than '}'>
