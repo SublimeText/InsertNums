@@ -5,7 +5,7 @@
 
 ## Installation
 
-This package is available on [Package Control][pkgctrl] as "InsertNums".
+You can install InsertNums via [Package Control][pkgctrl], by searching for **Insert Nums**.
 
 Alternatively, you can download the Zip and copy it to your Sublime Text Packages folder, or use `git clone`.
 
