@@ -16,15 +16,40 @@ module_name = "Insert Nums"
 
 # Utility functions ####################
 
-def strip_line_spaces(string):
-    return "\n".join([line.strip() for line in string.strip().split("\n")])
-
 
 def int_or_float(value):
     try:
         return int(value) if value is not None else None
     except ValueError:
         return float(value)
+
+
+def num_to_alpha(num, length=0):
+    res = ''
+
+    if length:
+        num = (num - 1) % (26 ** length) + 1
+
+    while num > 0:
+        num -= 1
+        res = chr(97 + (num % 26)) + res  # ord("a") == 97
+        num //= 26
+
+    return res
+
+
+def alpha_to_num(alpha):
+    res = 0
+
+    for c in alpha:
+        res *= 26
+        res += ord(c) - 96  # ord("a") == 97
+
+    return res
+
+
+def strip_line_spaces(string):
+    return "\n".join([line.strip() for line in string.strip().split("\n")])
 
 
 def get_rexexps(*ret):
@@ -190,10 +215,10 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
             # Always calculate with lower alphas and 0-based integers here
             length = len(start) if WRAP else 0
-            value = self.alpha_to_num(start.lower())
+            value = alpha_to_num(start.lower())
 
             for region in selections:
-                replace = self.num_to_alpha(value, length)
+                replace = num_to_alpha(value, length)
                 if UPPER:
                     replace = replace.upper()
                 if format:
@@ -201,28 +226,6 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
                 self.view.replace(edit, region, replace)
 
                 value += step
-
-    def num_to_alpha(self, num, length=0):
-        res = ''
-
-        if length:
-            num = (num - 1) % (26 ** length) + 1
-
-        while num > 0:
-            num -= 1
-            res = chr(97 + (num % 26)) + res  # ord("a") == 97
-            num //= 26
-
-        return res
-
-    def alpha_to_num(self, alpha):
-        res = 0
-
-        for c in alpha:
-            res *= 26
-            res += ord(c) - 96  # ord("a") == 97
-
-        return res
 
     def status(self, msg):
         print("[%s] %s" % (module_name, msg))
