@@ -28,6 +28,8 @@ InsertNums supports both, integers and floating numbers, as *start* and *step* v
     1.8
     2.2
 
+Furthermore, you can use arbitrary Python expressions to generate your numbers, e.g. for bitflags. An example can be found in the [Examples][#examples].
+
 See the [Advanced usage](#advaced-usage) section for information about using a specific formatting.
 
 ### Usage with the alphabet
@@ -52,7 +54,7 @@ For more options see the following [Advanced usage](#advaced-usage) section.
 
 ### Advanced usage
 
-The complete syntax is: `<start>:<step>~<format><reverse>`
+The complete syntax is: `<start>:<step>~<format>::<expr><reverse>`, the corresponding separator is only required if you actually supply the following part.
 
 Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
 
@@ -70,9 +72,15 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
 
 - **format** (optional)
 
-    + *with numbers*: A fomat string in Python's [Format Specific Mini-Language][fmtlang] (with small and unimportant adjustments for allowed types).
+    + *with numbers*: A format string in Python's [Format Specific Mini-Language][fmtlang] (with small and unimportant adjustments for allowed types).
 
     + *with alphabet*: Similar to with number but a stripped-down version only for strings. This only includes the `[[fill]align][width]` syntax and additionally accepts a `w` character at the end (see above).
+
+- **expr** (optional)
+
+    + *numbers only*: A valid Python expression which modifies the value as you please. You may use the variables `i` or `_`, which resemble the current value before the expression (`start + n * step`) and `p`, which is the previously evaluated value (defaults to `0`). The modules `math` and `random` are also supplied.
+
+      Note: The return type does not necessarily have to be a number type, you can also generate strings, tuples or booleans.
 
 - **reverse** (optional)
 
@@ -142,6 +150,20 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
     0.2080
     0.2100
     0.2120
+    ```
+
+- `0~#06x::1<<_`
+
+    ```
+    0x0001
+    0x0002
+    0x0004
+    0x0008
+    0x0010
+    0x0020
+    0x0040
+    0x0080
+    0x0100
     ```
 
 - `8:8~#010x!`
