@@ -14,10 +14,6 @@ if int(sublime.version()) > 3000:
 module_name = "Insert Nums"
 
 
-# TODO: expressions for "step" (e.g. "_**2")
-# TODO: expressions only for the value, independant of the actual "step"
-
-
 # Utility functions ####################
 
 def strip_line_spaces(string):
