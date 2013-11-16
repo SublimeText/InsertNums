@@ -15,7 +15,7 @@ Alternatively, you can download the Zip and copy it to your Sublime Text Package
 - **Windows** and **Linux**: <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd>
 - **OSX**: <kbd>⌘⌃N</kbd>
 
-Insert a string in the format `<start>:<step>` and press enter. *start* is required, while *step* can be omitted and defaults to `1`.
+Insert a string in the format `<start>:<step>` and press enter. Both can be omitted and default to `1` (meaning `1:1`).
 
 For every selected region the inserted number (starting with *start*) will then be increased by *step*.
 
@@ -54,19 +54,19 @@ For more options see the following [Advanced usage](#advaced-usage) section.
 
 ### Advanced usage
 
-The complete syntax is: `<start>:<step>~<format>::<expr><reverse>`, the corresponding separator is only required if you actually supply the following part.
+The complete syntax is: `<start>:<step>~<format>::<expr><reverse>`, the corresponding separator is only required if you actually supply the following part. Every part itself is optional (defaulting to `1:1`), but if you want the alpha mode you have to supply the alphabetical start value.
 
 Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
 
 - **start**
 
-    + *with numbers*: A *[decimalinteger]* or *[floatnumber]* according to Python's syntax specifications with an optional leading sign (`-` or `+`).
+    + *with numbers* (optional): A *[decimalinteger]* or *[floatnumber]* according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
 
-    + *with alphabet*: A sequence of either lower- or uppercase ASCII characters from the alphabet (`a` to `z` and `A` to `Z`).
+    + *with alphabet* (required): A sequence of either lower- or uppercase ASCII characters from the alphabet (`a` to `z` and `A` to `Z`).
 
 - **step** (optional)
 
-    + *with numbers*: A *[decimalinteger]* or *[floatnumber]* according to Python's syntax specifications with an optional leading sign (`-` or `+`).
+    + *with numbers*: A *[decimalinteger]* or *[floatnumber]* according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
 
     + *with alphabet*: A *[decimalinteger]* with an optional leading sign (`-` or `+`).
 
@@ -152,6 +152,18 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
     0.2120
     ```
 
+- `8:8~#010x!`
+
+    ```
+    0x00000038
+    0x00000030
+    0x00000028
+    0x00000020
+    0x00000018
+    0x00000010
+    0x00000008
+    ```
+
 - `0~#06x::1<<_`
 
     ```
@@ -166,16 +178,15 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
     0x0100
     ```
 
-- `8:8~#010x!`
+- `::i**2`
 
     ```
-    0x00000038
-    0x00000030
-    0x00000028
-    0x00000020
-    0x00000018
-    0x00000010
-    0x00000008
+    1
+    4
+    9
+    16
+    25
+    36
     ```
 
 - `z:25~w` or `z:-1~w`

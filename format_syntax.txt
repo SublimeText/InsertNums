@@ -1,6 +1,6 @@
 # insert_spec   ::=  insertnum | insertalpha
 
-insertnum     ::=  signednum[:signednum][~format][::expr] ["!"]
+insertnum     ::=  [signednum][:signednum][~format][::expr] ["!"]
 
 signednum     ::=  ["+" | "-"] (integer | float)
 numeric       ::=  integer | float

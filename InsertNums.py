@@ -26,7 +26,7 @@ def strip_line_spaces(string):
 
 def int_or_float(value):
     try:
-        return int(value)
+        return int(value) if value is not None else None
     except ValueError:
         return float(value)
 
@@ -62,13 +62,15 @@ def get_rexexps(*ret):
         expr          ::=  [^!]*
 
         # finals
-        insertnum     ::=  ^ (?P<start> {signednum})
+        insertnum     ::=  ^
+                           ( (?P<start> {signednum}) )?
                            (: (?P<step> {signednum}) )?
                            (~ (?P<format> {format}) )?
                            (:: (?P<expr> {expr}) )?
                            (?P<reverse> !)? $
 
-        insertalpha   ::=  ^ (?P<start> {alphastart})
+        insertalpha   ::=  ^
+                           (?P<start> {alphastart})
                            (: (?P<step> {signedint}) )?
                            (~ (?P<format> {alphaformat})
                               (?P<wrap> w)? )?
@@ -135,7 +137,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
         # Read values
         ALPHA  = 'wrap' in m
-        start  = ALPHA and m['start'] or int_or_float(m['start'])
+        start  = ALPHA and m['start'] or int_or_float(m['start']) or 1
         step   = int_or_float(m['step']) if m['step'] else 1
         format = m['format']
         expr   = m['expr']
