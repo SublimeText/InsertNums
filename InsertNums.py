@@ -147,8 +147,8 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
     insertnum, insertalpha = get_rexexps("insertnum", "insertalpha")
 
     def run(self, edit, format=''):
-        if not format or not isinstance(format, basestring):
-            return self.status("Format string is not a string or empty: %r" % format)
+        if not isinstance(format, basestring):
+            return self.status("Format string is not a string: %r" % format)
 
         # Parse "format"
         m = re.match(self.insertnum, format, re.X) or re.match(self.insertalpha, format, re.X)
@@ -158,7 +158,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
         # Read values
         ALPHA  = 'wrap' in m
-        start  = ALPHA and m['start'] or int_or_float(m['start']) or 1
+        start  = int_or_float(m['start']) if not ALPHA and m['start'] else 1
         step   = int_or_float(m['step']) if m['step'] else 1
         format = m['format']
         expr   = not ALPHA and m['expr']
