@@ -52,7 +52,7 @@ def strip_line_spaces(string):
     return "\n".join([line.strip() for line in string.strip().split("\n")])
 
 
-def get_rexexps(*ret):
+def get_regexps(*ret):
     # Construct regexp for format string
     # Spacing doesn't matter due to (?x); escape normal } using }}
     repository_source = r"""
@@ -129,36 +129,103 @@ def get_rexexps(*ret):
         return repository
 
 
+def status(msg):
+    print("[%s] %s" % (module_name, msg))
+    sublime.status_message(msg)
+
+
 # The Commands #########################
 
+# While this is not 0, the input panel is open
+vid = 0
+# These are required to let on_selection_modified know if the selection
+# differs, abort in that case to prevent unexpectable behaviour
+lastsel = []
+initsel = []
+
+
 class PromptInsertNumsCommand(sublime_plugin.TextCommand):
+
+    # revert changes in history for clean undo history
+    def revert_changes(self):
+        global vid
+
+        lcom = self.view.command_history(0)
+
+        # Last command called should be "prompt_insert_nums" or "insert_nums"
+        if lcom[0].endswith("insert_nums"):
+            self.view.run_command("undo")
+
+    def on_done(self, format):
+        global vid
+
+        vid = 0
+        self.revert_changes()
+        self.view.run_command("insert_nums", {"format": format})
+
+    def preview(self, format):
+        global vid, initsel
+
+        if not vid:
+            # Init preview mode
+            vid = self.view.id()
+            initsel = list(self.view.sel())
+        else:
+            self.revert_changes()
+
+        self.view.run_command("insert_nums", {"format": format})
+
+    def cancel(self):
+        global vid, initsel, lastsel
+
+        if vid:
+            # Reset preview mode
+            self.revert_changes()
+            vid = 0
+            initsel, lastsel = [], []
+
     def run(self, edit):
         self.view.window().show_input_panel(
-            "Enter a Format string like '1:1':",
+            "Enter a Format string (default: '1:1'):",
             '',
-            lambda x: self.view.run_command("insert_nums", {"format": x}),
-            None,  # TODO: Preview
-            None
+            self.on_done,  # on_done
+            self.preview,  # on_change
+            self.cancel    # on_cancel
         )
+
+
+class SelectionListener(sublime_plugin.EventListener):
+    def on_selection_modified(self, view):
+        global vid, initsel, lastsel
+
+        # Test if selection differs from either before modification state or
+        # from after the last insert_nums call. If yes, it has been modified
+        # and could produce unexpectable results.
+        if vid == view.id() and list(view.sel()) not in (initsel, lastsel):
+            status("Selection has been modified by third-party. Aborting.")
+            # For some reason this does NOT undo the change by insert_nums
+            view.window().run_command("hide_panel", {"cancel": True})
 
 
 class InsertNumsCommand(sublime_plugin.TextCommand):
     # Regular expressions for format syntax
-    insertnum, insertalpha = get_rexexps("insertnum", "insertalpha")
+    insertnum, insertalpha = get_regexps("insertnum", "insertalpha")
 
     def run(self, edit, format=''):
+        global vid, lastsel
+
         if not isinstance(format, basestring):
-            return self.status("Format string is not a string: %r" % format)
+            return status("Format string is not a string: %r" % format)
 
         # Parse "format"
         m = re.match(self.insertnum, format, re.X) or re.match(self.insertalpha, format, re.X)
         if not m:
-            return self.status("Format string is invalid: %s" % format)
+            return status("Format string is invalid: %s" % format)
         m = m.groupdict()
 
         # Read values
         ALPHA  = 'wrap' in m
-        start  = int_or_float(m['start']) if not ALPHA and m['start'] else 1
+        start  = (int_or_float(m['start']) if m['start'] else 1) if not ALPHA else m['start']
         step   = int_or_float(m['step']) if m['step'] else 1
         format = m['format']
         expr   = not ALPHA and m['expr']
@@ -166,9 +233,9 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         # Reverse the regions if requested | by default, this works like an iterator
         selections = self.view.sel()
         if m['reverse']:
-            # Construct a real list and reverse that, won't affect the regions
-            # since we're going backwards
-            selections = reversed(reg for reg in selections)
+            # Construct a real list and reverse that; it won't affect the
+            # regions since we're going backwards
+            selections = reversed(selections)
 
         # Do the stuff
         if not ALPHA:
@@ -209,6 +276,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
                 self.view.replace(edit, region, replace)
 
                 value += step
+
         else:
             UPPER = ALPHA and m['start'][0].isupper()
             WRAP = ALPHA and bool(m['wrap'])
@@ -227,6 +295,6 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
                 value += step
 
-    def status(self, msg):
-        print("[%s] %s" % (module_name, msg))
-        sublime.status_message(msg)
+        # We're done
+        if vid:
+            lastsel = list(self.view.sel())
