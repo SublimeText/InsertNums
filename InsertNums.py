@@ -99,6 +99,7 @@ def get_regexps(*ret):
                            (: (?P<step> {signedint}) )?
                            (~ (?P<format> {alphaformat})
                               (?P<wrap> w)? )?
+                           (@ (?P<stopexpr> {stopexpr}) )?
                            (?P<reverse> !)? $
     """
     # Our most important variable
@@ -231,12 +232,13 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
         # Read values
         ALPHA     = 'wrap' in m
-        start     = ((int_or_float(m['start']) if m['start'] else 1)
-                     if not ALPHA else m['start'])
         step      = int_or_float(m['step']) if m['step'] else 1
         format    = m['format']
         expr      = not ALPHA and m['expr']
-        stop_expr = not ALPHA and m['stopexpr']
+        stop_expr = m['stopexpr']
+
+        UPPER     = ALPHA and m['start'][0].isupper()
+        WRAP      = ALPHA and bool(m['wrap'])
 
         # Reverse the regions if requested | by default, this works like an
         # iterator
@@ -247,33 +249,43 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
         # Do the stuff
         if not ALPHA:
-            value = start
+            value = (int_or_float(m['start']) if m['start'] else 1)
 
             # Convert to float if precision in format string
             if format and '.' in format or isinstance(step, float):
                 value = float(value)
+        else:
+            # Always calculate with lower alphas and 0-based integers here
+            value = alpha_to_num(m['start'].lower())
+            length = len(value) if WRAP else 0
 
-            # Save the previously evaluated value for `p` (defaults to 0)
-            eval_value = 0
-            # Use a counter for the eval env and for break condition
-            i = 0
-            # Save a timestamp to circumvent infinite loops caused by the user
-            start_time = time.time()
-            # By default, do not process longer than 100ms!
-            time_limit = 0.1
+        # Save the previously evaluated value for `p` (defaults to 0)
+        eval_value = 0
+        # Use a counter for the eval env and for break condition
+        i = 0
+        # Save a timestamp to circumvent infinite loops caused by the user
+        start_time = time.time()
+        # By default, do not process longer than 100ms!
+        time_limit = 0.1
 
-            while True:
-                if not stop_expr and i == len(selections):
-                    break
-                if time.time() > start_time + time_limit:
-                    status("Time limit of %.3fs exceeded" % time_limit)
-                    break
+        while True:
+            if not stop_expr and i == len(selections):
+                break
+            if time.time() > start_time + time_limit:
+                status("Time limit of %.3fs exceeded" % time_limit)
+                break
 
-                # Build eval environment
-                if expr or stop_expr:
-                    env = dict(_=value, i=value, p=eval_value, s=step,
-                               n=len(selections), math=math, random=random)
+            # Build eval environment
+            if expr or stop_expr:
+                env = dict(_=value, i=value, p=eval_value, s=step,
+                           n=len(selections), math=math, random=random)
 
+            if ALPHA:
+                # No expression evaluation for alpha mode
+                eval_value = num_to_alpha(value, length)
+                if UPPER:
+                    eval_value = eval_value.upper()
+            else:
                 # Evaluate the expression, if given
                 if expr:
                     try:
@@ -292,59 +304,39 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
                 else:
                     eval_value = value
 
-                # Evaluate stop condition, if given
-                if stop_expr:
-                    # Re-use env that has potentially been used before but
-                    # append the current evaluated value
-                    env['c'] = eval_value
-                    try:
-                        if bool(eval(stop_expr, env)):
-                            break
-                    except Exception as e:
-                        if quiet:
-                            status("Invalid Stop Expression: `%s`" % stop_expr)
-                            # Reset the stop expression so that we can exit the
-                            # loop when all selections have been processed
-                            stop_expr = None
-                        else:
-                            sublime.error_message(
-                                "[%s] Invalid Stop Expression\n\n"
-                                "The expression `%s` raised an exception:\n\n"
-                                "%r" % (module_name, stop_expr, e)
-                            )
-                            return
+            # Evaluate stop condition, if given
+            if stop_expr:
+                # Re-use env that has potentially been used before but
+                # append the current evaluated value
+                env['c'] = eval_value
+                try:
+                    if bool(eval(stop_expr, env)):
+                        break
+                except Exception as e:
+                    if quiet:
+                        status("Invalid Stop Expression: `%s`" % stop_expr)
+                        # Reset the stop expression so that we can exit the
+                        # loop when all selections have been processed
+                        stop_expr = None
+                    else:
+                        sublime.error_message(
+                            "[%s] Invalid Stop Expression\n\n"
+                            "The expression `%s` raised an exception:\n\n"
+                            "%r" % (module_name, stop_expr, e)
+                        )
+                        return
 
-                # Format
-                if format:
-                    replace = "{value:{format}}".format(value=eval_value,
-                                                        format=format)
-                else:
-                    replace = str(eval_value)
-                # self.view.replace(edit, region, replace)
-                values.append(eval_value)
+            # Format
+            if format:
+                replace = "{value:{format}}".format(value=eval_value,
+                                                    format=format)
+            else:
+                replace = str(eval_value)
+            # self.view.replace(edit, region, replace)
+            values.append(replace)
 
-                value += step
-                i += 1
-
-        else:
-            UPPER = ALPHA and m['start'][0].isupper()
-            WRAP = ALPHA and bool(m['wrap'])
-
-            # Always calculate with lower alphas and 0-based integers here
-            length = len(start) if WRAP else 0
-            value = alpha_to_num(start.lower())
-
-            for region in selections:
-                replace = num_to_alpha(value, length)
-                if UPPER:
-                    replace = replace.upper()
-                if format:
-                    replace = "{value:{format}}".format(value=replace,
-                                                        format=format)
-                # self.view.replace(edit, region, replace)
-                values.append(replace)
-
-                value += step
+            value += step
+            i += 1
 
         # Insert the values into the regions (possibly in reversed order)
         for i, region in enumerate(selections):
