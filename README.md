@@ -78,7 +78,7 @@ Detailed Syntax definition: [format_syntax.txt](format_syntax.txt)
 
 - **expr** (optional)
 
-    + *numbers only*: A valid Python expression which modifies the value as you please. You may use the variables `i` or `_`, which resemble the current value before the expression (`start + n * step`) and `p`, which is the previously evaluated value (defaults to `0`). The modules `math` and `random` are also supplied.
+    + *numbers only*: A valid Python expression which modifies the value as you please. You may use the variables `_`, which resembles the current value before the expression (`start + n * step`) and `p`, which is the previously evaluated value (defaults to `0`). The modules `math` and `random` are also supplied.
 
       Note: The return type does not necessarily have to be a number type, you can also generate strings, tuples or booleans.
 

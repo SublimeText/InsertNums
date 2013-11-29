@@ -277,7 +277,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
             # Build eval environment
             if expr or stop_expr:
-                env = dict(_=value, i=value, p=eval_value, s=step,
+                env = dict(_=value, i=i, p=eval_value, s=step,
                            n=len(selections), math=math, random=random)
 
             if ALPHA:
