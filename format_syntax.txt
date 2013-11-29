@@ -1,10 +1,11 @@
 # insert_spec   ::=  insertnum | insertalpha
 
-insertnum     ::=  [signednum][:signednum][~format][::expr] ["!"]
+insertnum     ::=  [signednum][:signednum][~format][::expr][@stopexpr] ["!"]
 
 signednum     ::=  ["+" | "-"] (integer | float)
 numeric       ::=  integer | float
-expr          ::=  <a character other than '!'>*
+expr          ::=  <a character other than '!' or @>+
+stop_expr     ::=  <a character other than '!'>+
 
 # essentially Python's "str.format" syntax
 format        ::=  [[fill]align][sign][#][0][width][.precision][type]

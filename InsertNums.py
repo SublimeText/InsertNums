@@ -1,4 +1,5 @@
 import re
+import time
 
 # Modules for expression evaluation
 import math
@@ -56,6 +57,7 @@ def get_regexps(*ret):
     # Construct regexp for format string
     # Spacing doesn't matter due to (?x); escape normal } using }}
     repository_source = r"""
+        # 1:2~+03::i*2@i==10!
         # base
         integer       ::=  [1-9]\d* | 0
         signedint     ::=  [+-]? {integer}
@@ -80,7 +82,8 @@ def get_regexps(*ret):
                            {integer}?        # width
 
         # generic python expression (keep it simple)
-        expr          ::=  [^!]*
+        expr          ::=  [^!@]+
+        stopexpr      ::=  [^!]+
 
         # finals
         insertnum     ::=  ^
@@ -88,6 +91,7 @@ def get_regexps(*ret):
                            (: (?P<step> {signednum}) )?
                            (~ (?P<format> {format}) )?
                            (:: (?P<expr> {expr}) )?
+                           (@ (?P<stopexpr> {stopexpr}) )?
                            (?P<reverse> !)? $
 
         insertalpha   ::=  ^
@@ -97,7 +101,6 @@ def get_regexps(*ret):
                               (?P<wrap> w)? )?
                            (?P<reverse> !)? $
     """
-
     # Our most important variable
     repository = {}
 
@@ -113,8 +116,10 @@ def get_regexps(*ret):
             pass
 
         if key:
-            # Remove comments and multiple whitespaces and wrap in non-capturing group
-            pattern = "(?:%s)" % strip_line_spaces(re.sub(r"(?m)\s#\s.*$", '', pattern))
+            # Remove comments and multiple whitespaces and wrap in non-capturing
+            # group
+            no_comments = re.sub(r"(?m)\s#\s.*$", '', pattern)
+            pattern = "(?:%s)" % strip_line_spaces(no_comments)
 
             # Now, replace format strings (requires correct order)
             repository[key] = pattern.format(**repository)
@@ -173,7 +178,7 @@ class PromptInsertNumsCommand(sublime_plugin.TextCommand):
         else:
             self.revert_changes()
 
-        self.view.run_command("insert_nums", {"format": format})
+        self.view.run_command("insert_nums", {"format": format, "quiet": True})
 
     def cancel(self):
         global vid, initsel, lastsel
@@ -211,71 +216,115 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
     # Regular expressions for format syntax
     insertnum, insertalpha = get_regexps("insertnum", "insertalpha")
 
-    def run(self, edit, format=''):
+    def run(self, edit, format='', quiet=False):
         global vid, lastsel
 
         if not isinstance(format, basestring):
             return status("Format string is not a string: %r" % format)
 
         # Parse "format"
-        m = re.match(self.insertnum, format, re.X) or re.match(self.insertalpha, format, re.X)
+        m = (re.match(self.insertnum, format, re.X)
+             or re.match(self.insertalpha, format, re.X))
         if not m:
             return status("Format string is invalid: %s" % format)
         m = m.groupdict()
 
         # Read values
-        ALPHA  = 'wrap' in m
-        start  = (int_or_float(m['start']) if m['start'] else 1) if not ALPHA else m['start']
-        step   = int_or_float(m['step']) if m['step'] else 1
-        format = m['format']
-        expr   = not ALPHA and m['expr']
+        ALPHA     = 'wrap' in m
+        start     = ((int_or_float(m['start']) if m['start'] else 1)
+                     if not ALPHA else m['start'])
+        step      = int_or_float(m['step']) if m['step'] else 1
+        format    = m['format']
+        expr      = not ALPHA and m['expr']
+        stop_expr = not ALPHA and m['stopexpr']
 
-        # Reverse the regions if requested | by default, this works like an iterator
+        # Reverse the regions if requested | by default, this works like an
+        # iterator
         selections = self.view.sel()
-        if m['reverse']:
-            # Construct a real list and reverse that; it won't affect the
-            # regions since we're going backwards
-            selections = reversed(selections)
+
+        # Create a list that will store all generated values
+        values = []
 
         # Do the stuff
         if not ALPHA:
             value = start
 
             # Convert to float if precision in format string
-            if ((format and '.' in format or isinstance(step, float))
-                    and isinstance(value, int)):
+            if format and '.' in format or isinstance(step, float):
                 value = float(value)
 
             # Save the previously evaluated value for `p` (defaults to 0)
             eval_value = 0
+            # Use a counter for the eval env and for break condition
+            i = 0
+            # Save a timestamp to circumvent infinite loops caused by the user
+            start_time = time.time()
+            # By default, do not process longer than 100ms!
+            time_limit = 0.1
 
-            for region in selections:
+            while True:
+                if not stop_expr and i == len(selections):
+                    break
+                if time.time() > start_time + time_limit:
+                    status("Time limit of %.3fs exceeded" % time_limit)
+                    break
+
+                # Build eval environment
+                if expr or stop_expr:
+                    env = dict(_=value, i=value, p=eval_value, s=step,
+                               n=len(selections), math=math, random=random)
+
                 # Evaluate the expression, if given
                 if expr:
-                    # Build environment
-                    env = dict(_=value, i=value, p=eval_value, s=step,
-                               # Some useful modules
-                               math=math, random=random)
                     try:
                         eval_value = eval(expr, env)
                     except Exception as e:
-                        sublime.error_message(
-                            "[%s] Invalid Expression\n\n"
-                            "The expression `%s` raised an exception:\n\n"
-                            "%r" % (module_name, expr, e)
-                        )
-                        return
+                        if quiet:
+                            status("Invalid Expression: `%s`" % expr)
+                        else:
+                            # Show unevaluated status if "quiet"
+                            sublime.error_message(
+                                "[%s] Invalid Expression\n\n"
+                                "The expression `%s` raised an exception:\n\n"
+                                "%r" % (module_name, expr, e)
+                            )
+                            return
                 else:
                     eval_value = value
 
+                # Evaluate stop condition, if given
+                if stop_expr:
+                    # Re-use env that has potentially been used before but
+                    # append the current evaluated value
+                    env['c'] = eval_value
+                    try:
+                        if bool(eval(stop_expr, env)):
+                            break
+                    except Exception as e:
+                        if quiet:
+                            status("Invalid Stop Expression: `%s`" % stop_expr)
+                            # Reset the stop expression so that we can exit the
+                            # loop when all selections have been processed
+                            stop_expr = None
+                        else:
+                            sublime.error_message(
+                                "[%s] Invalid Stop Expression\n\n"
+                                "The expression `%s` raised an exception:\n\n"
+                                "%r" % (module_name, stop_expr, e)
+                            )
+                            return
+
                 # Format
                 if format:
-                    replace = "{value:{format}}".format(value=eval_value, format=format)
+                    replace = "{value:{format}}".format(value=eval_value,
+                                                        format=format)
                 else:
                     replace = str(eval_value)
-                self.view.replace(edit, region, replace)
+                # self.view.replace(edit, region, replace)
+                values.append(eval_value)
 
                 value += step
+                i += 1
 
         else:
             UPPER = ALPHA and m['start'][0].isupper()
@@ -290,10 +339,32 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
                 if UPPER:
                     replace = replace.upper()
                 if format:
-                    replace = "{value:{format}}".format(value=replace, format=format)
-                self.view.replace(edit, region, replace)
+                    replace = "{value:{format}}".format(value=replace,
+                                                        format=format)
+                # self.view.replace(edit, region, replace)
+                values.append(replace)
 
                 value += step
+
+        # Insert the values into the regions (possibly in reversed order)
+        for i, region in enumerate(selections):
+            if i >= len(values):
+                # print("More selections than values generated.")
+                # Start at 0, break or insert "" for the remaining?
+                text = ""
+
+            elif i + 1 == len(selections) != len(values):
+                # Last selection and more than 1 values to go
+                other = (values[i:] if not m['reverse']
+                         else values[-i - 1::-1])  # splicesssss
+                text = "\n".join(map(str, other))
+
+            else:
+                if m['reverse']:
+                    i = -i - 1
+                text = str(values[i])
+
+            self.view.replace(edit, region, text)
 
         # We're done
         if vid:
