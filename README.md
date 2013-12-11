@@ -5,7 +5,7 @@ Sublime Text plugin, that inserts consecutive numbers across multiple selections
 After quick testing, InsertNums is compatible with ST2 and ST3!
 
 ## Installation
-You can install InsertNums via [Package Control](http://wbond.net/sublime_packages/package_control), by searching for **Insert Sequences**.
+You can install InsertNums via [Package Control](http://wbond.net/sublime_packages/package_control), by searching for **Insert Nums**.
 
 Optionally you can download the Zip and copy it to your Sublime Text Packages folder, or use `git clone`. I'll make a pull request shortly to add it to Package Control.
 
