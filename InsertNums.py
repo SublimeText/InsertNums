@@ -9,7 +9,8 @@ import sublime
 import sublime_plugin
 
 # Compatability
-if int(sublime.version()) > 3000:
+ST3 = int(sublime.version()) > 3000
+if ST3:
     basestring = str
 
 module_name = "Insert Nums"
@@ -81,11 +82,19 @@ def get_regexps(*ret):
         alphaformat   ::=  ([^}}]?[<>=^])?   # (fill)align
                            {integer}?        # width
 
+        cast          ::=  [ifsb]
+
         # generic python expression (keep it simple)
         expr          ::=  [^!@]+
         stopexpr      ::=  [^!]+
 
         # finals
+        exprmode      ::=  ^ (?P<cast> {cast})? \|
+                           (~ (?P<format> {format}) ::)?
+                           (?P<expr> {expr})?
+                           (@ (?P<stopexpr> {stopexpr}) )?
+                           (?P<reverse> !)? $
+
         insertnum     ::=  ^
                            ( (?P<start> {signednum}) )?
                            (: (?P<step> {signednum}) )?
@@ -215,7 +224,11 @@ class SelectionListener(sublime_plugin.EventListener):
 
 class InsertNumsCommand(sublime_plugin.TextCommand):
     # Regular expressions for format syntax
-    insertnum, insertalpha = get_regexps("insertnum", "insertalpha")
+    regexps = get_regexps("insertnum", "insertalpha", "exprmode")
+    insertnum, insertalpha, exprmode = regexps
+    casttable = dict(s=str, b=bool, i=int, f=float)
+    if not ST3:
+        casttable['s'] = unicode
 
     def run(self, edit, format='', quiet=False):
         global vid, lastsel
@@ -225,17 +238,25 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
 
         # Parse "format"
         m = (re.match(self.insertnum, format, re.X)
-             or re.match(self.insertalpha, format, re.X))
+             or re.match(self.insertalpha, format, re.X)
+             or re.match(self.exprmode, format, re.X))
         if not m:
-            return status("Format string is invalid: %s" % format)
+            msg = "Format string is invalid: %s" % format
+            if quiet:
+                # Do not spam the console in preview mode
+                return sublime.status_message(msg)
+            else:
+                return status(msg)
         m = m.groupdict()
 
         # Read values
+        EXPRMODE  = 'start' not in m
         ALPHA     = 'wrap' in m
-        step      = int_or_float(m['step']) if m['step'] else 1
+        step      = int_or_float(m['step']) if 'step' in m and m['step'] else 1
         format    = m['format']
         expr      = not ALPHA and m['expr']
         stop_expr = m['stopexpr']
+        cast      = EXPRMODE and m['cast'] or "s"
 
         UPPER     = ALPHA and m['start'][0].isupper()
         WRAP      = ALPHA and bool(m['wrap'])
@@ -248,7 +269,9 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         values = []
 
         # Do the stuff
-        if not ALPHA:
+        if EXPRMODE:
+            pass
+        elif not ALPHA:
             value = (int_or_float(m['start']) if m['start'] else 1)
 
             # Convert to float if precision in format string
@@ -268,79 +291,118 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         # By default, do not process longer than 100ms!
         time_limit = 0.1
 
+        # In case the (generated) value should be skipped
+        skip = False
+
         while True:
-            if not stop_expr and i == len(selections):
+            if (EXPRMODE or not stop_expr) and i == len(selections):
                 break
             if time.time() > start_time + time_limit:
-                status("Time limit of %.3fs exceeded" % time_limit)
+                sublime.status_message("Time limit of %.3fs exceeded" %
+                                       time_limit)
                 break
 
-            # Build eval environment
-            if expr or stop_expr:
-                env = dict(_=value, i=i, p=eval_value, s=step,
-                           n=len(selections), math=math, random=random)
-
-            if ALPHA:
-                # No expression evaluation for alpha mode
-                eval_value = num_to_alpha(value, length)
-                if UPPER:
-                    eval_value = eval_value.upper()
-            else:
-                # Evaluate the expression, if given
-                if expr:
-                    try:
-                        eval_value = eval(expr, env)
-                    except Exception as e:
-                        if quiet:
-                            status("Invalid Expression: `%s`" % expr)
-                        else:
-                            # Show unevaluated status if "quiet"
-                            sublime.error_message(
-                                "[%s] Invalid Expression\n\n"
-                                "The expression `%s` raised an exception:\n\n"
-                                "%r" % (module_name, expr, e)
-                            )
-                            return
-                else:
-                    eval_value = value
-
-            # Evaluate stop condition, if given
-            if stop_expr:
-                # Re-use env that has potentially been used before but
-                # append the current evaluated value
-                env['c'] = eval_value
+            if EXPRMODE:
+                value = self.view.substr(selections[i])
+                # Try to cast the value to what was requested (str is default)
                 try:
-                    if bool(eval(stop_expr, env)):
-                        break
+                    value = self.casttable[cast](value)
                 except Exception as e:
                     if quiet:
-                        status("Invalid Stop Expression: `%s`" % stop_expr)
-                        # Reset the stop expression so that we can exit the
-                        # loop when all selections have been processed
-                        stop_expr = None
+                        # Show status message if "quiet" (in preview) Alos print
+                        # to console as this doesn't happen too often but might
+                        # be really useful information
+                        status("Unable to cast `%s` to '%s'" % (value, cast))
+                        skip = True
                     else:
                         sublime.error_message(
-                            "[%s] Invalid Stop Expression\n\n"
-                            "The expression `%s` raised an exception:\n\n"
-                            "%r" % (module_name, stop_expr, e)
+                            "[%s] Invalid Expression\n\n"
+                            "Selection `%s` could not be casted to '%s':\n\n"
+                            "%r" % (module_name, value, cast, e)
                         )
                         return
 
-            # Format
-            if format:
-                replace = "{value:{format}}".format(value=eval_value,
-                                                    format=format)
-            else:
-                replace = str(eval_value)
-            # self.view.replace(edit, region, replace)
-            values.append(replace)
+            if not skip:
+                # Build eval environment
+                if expr or stop_expr:
+                    env = dict(_=value, i=i, p=eval_value, s=step,
+                               n=len(selections), math=math, random=random)
+                    if EXPRMODE:
+                        del env['s']  # We don't need the step here
 
-            value += step
+                if ALPHA:
+                    # No expression evaluation for alpha mode
+                    eval_value = num_to_alpha(value, length)
+                    if UPPER:
+                        eval_value = eval_value.upper()
+                else:
+                    # Evaluate the expression, if given
+                    if expr:
+                        try:
+                            eval_value = eval(expr, env)
+                        except Exception as e:
+                            if quiet:
+                                # Show unevaluated status if "quiet"
+                                sublime.status_message("Invalid Expression: "
+                                                       "`%s`" % expr)
+                                if EXPRMODE:
+                                    # No need to continue if in expr mode
+                                    return
+                            else:
+                                sublime.error_message(
+                                    "[%s] Invalid Expression\n\n"
+                                    "The expression `%s` raised an exception:\n"
+                                    "\n%r" % (module_name, expr, e)
+                                )
+                                return
+                    else:
+                        eval_value = value
+
+                # Evaluate stop condition, if given
+                if stop_expr:
+                    # Re-use env that has potentially been used before but
+                    # append the current evaluated value
+                    env['c'] = eval_value
+                    try:
+                        if bool(eval(stop_expr, env)):
+                            break
+                    except Exception as e:
+                        if quiet:
+                            sublime.status_message("Invalid Stop Expression: "
+                                                   "`%s`" % stop_expr)
+                            # Reset the stop expression so that we can exit the
+                            # loop when all selections have been processed
+                            stop_expr = None
+                        else:
+                            sublime.error_message(
+                                "[%s] Invalid Stop Expression\n\n"
+                                "The expression `%s` raised an exception:\n\n"
+                                "%r" % (module_name, stop_expr, e)
+                            )
+                            return
+
+                # Format
+                if format:
+                    replace = "{value:{format}}".format(value=eval_value,
+                                                        format=format)
+                else:
+                    replace = str(eval_value)
+
+            values.append(replace if not skip else value)
+
+            if not EXPRMODE:
+                value += step
             i += 1
+            skip = False
 
         # Insert the values into the regions (possibly in reversed order)
         for i, region in enumerate(selections):
             if i >= len(values):
+                if EXPRMODE:
+                    # If we have a stopexpr in exprmode just don't touch the
+                    # other selections at all
+                    break
+
                 # print("More selections than values generated.")
                 # Start at 0, break or insert "" for the remaining?
                 text = ""

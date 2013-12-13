@@ -1,4 +1,7 @@
-# insert_spec   ::=  insertnum | insertalpha
+# insert_spec ::=  insertnum | insertalpha | exprmode
+
+exprmode      ::=  [cast] "|" [~format::][expr][@stopexpr] ["!"]
+cast          ::=  "i" | "f" | "s" | "b"
 
 insertnum     ::=  [signednum][:signednum][~format][::expr][@stopexpr] ["!"]
 
@@ -16,7 +19,8 @@ width         ::=  integer
 precision     ::=  integer
 type          ::=  "b" | "c" | "d" | "e" | "E" | "f" | "F" | "g" | "G" | "n" | "o" | "x" | "X" | "%"
 
-insertalpha   ::=  alphastart[:signedint][~[alphaformat] ["w"]] ["!"]
+
+insertalpha   ::=  alphastart[:signedint][~[alphaformat] ["w"]][@stopexpr] ["!"]
 
 alphastart    ::=  alphalower+ | alphaupper+
 alphalower    ::=  "a"..."z"
