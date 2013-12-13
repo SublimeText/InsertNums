@@ -1,6 +1,6 @@
-# Sublime Text - InsertNums
+# Sublime Text - Insert Nums
 
-**Sublime Text 2 and 3** plugin, that inserts consecutive numbers across multiple selections.
+**Sublime Text 2 and 3** plugin, that inserts (consecutive) numbers across multiple selections or modifies the selections' contents with expressions. Huge configurability.
 
 
 ## Installation
