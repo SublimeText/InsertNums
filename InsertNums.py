@@ -149,7 +149,8 @@ def status(msg):
     sublime.status_message(msg)
 
 
-# The Commands #########################
+# The Environment #####################
+
 
 # While this is not 0, the input panel is open
 vid = 0
@@ -159,9 +160,25 @@ lastsel = []
 initsel = []
 
 
+class SelectionListener(sublime_plugin.EventListener):
+    def on_selection_modified(self, view):
+        global vid, initsel, lastsel
+
+        # Test if selection differs from either before modification state or
+        # from after the last insert_nums call. If yes, it has been modified
+        # and could produce unexpectable results.
+        if vid == view.id() and list(view.sel()) not in (initsel, lastsel):
+            status("Selection has been modified by third-party. Aborting.")
+            # For some reason this does NOT undo the change by insert_nums
+            view.window().run_command("hide_panel", {"cancel": True})
+
+
+# The Commands #########################
+
+
 class PromptInsertNumsCommand(sublime_plugin.TextCommand):
 
-    # revert changes in history for clean undo history
+    # revert changes for clean undo history
     def revert_changes(self):
         global vid
 
@@ -207,19 +224,6 @@ class PromptInsertNumsCommand(sublime_plugin.TextCommand):
             self.preview,  # on_change
             self.cancel    # on_cancel
         )
-
-
-class SelectionListener(sublime_plugin.EventListener):
-    def on_selection_modified(self, view):
-        global vid, initsel, lastsel
-
-        # Test if selection differs from either before modification state or
-        # from after the last insert_nums call. If yes, it has been modified
-        # and could produce unexpectable results.
-        if vid == view.id() and list(view.sel()) not in (initsel, lastsel):
-            status("Selection has been modified by third-party. Aborting.")
-            # For some reason this does NOT undo the change by insert_nums
-            view.window().run_command("hide_panel", {"cancel": True})
 
 
 class InsertNumsCommand(sublime_plugin.TextCommand):
