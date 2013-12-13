@@ -335,8 +335,11 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
             if not skip:
                 # Build eval environment
                 if expr or stop_expr:
-                    env = dict(_=value, i=i, p=eval_value, s=step,
-                               n=len(selections), math=math, random=random)
+                    env = dict(
+                        _=value, i=i, p=eval_value, s=step, n=len(selections),
+                        # Modules
+                        math=math, random=random, re=re
+                    )
                     if EXPRMODE:
                         del env['s']  # We don't need the step here
 
