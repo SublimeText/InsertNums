@@ -40,7 +40,7 @@ InsertNums supports both, integers and floating numbers, as *start* and *step* v
     1.8
     2.2
 
-Furthermore, you can use arbitrary Python expressions to generate your numbers, e.g. for bitflags. An example can be found in the [Examples][#examples].
+Furthermore, you can use arbitrary Python expressions to generate your numbers, e.g. for bitflags. An example can be found in the [Examples](#examples).
 
 See the [Advanced usage](#advaced-usage) section for information about using a specific formatting.
 
