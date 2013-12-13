@@ -1,14 +1,15 @@
 # insert_spec ::=  insertnum | insertalpha | exprmode
 
-exprmode      ::=  [cast] "|" [~format::][expr][@stopexpr] ["!"]
+exprmode      ::=  [cast] "|" [~format::] expr [@stopexpr] ["!"]
 cast          ::=  "i" | "f" | "s" | "b"
 
 insertnum     ::=  [signednum][:signednum][~format][::expr][@stopexpr] ["!"]
 
 signednum     ::=  ["+" | "-"] (integer | float)
 numeric       ::=  integer | float
-expr          ::=  <a character other than '!' or @>+
-stop_expr     ::=  <a character other than '!'>+
+# The following are kinda "hacks" but i cba to do it correctly
+expr          ::=  <any character until the next match>+
+stop_expr     ::=  <any character until the next match>+
 
 # essentially Python's "str.format" syntax
 format        ::=  [[fill]align][sign][#][0][width][.precision][type]

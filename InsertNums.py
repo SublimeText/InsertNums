@@ -85,13 +85,15 @@ def get_regexps(*ret):
         cast          ::=  [ifsb]
 
         # generic python expression (keep it simple)
-        expr          ::=  [^!@]+
-        stopexpr      ::=  [^!]+
+        # Considered using greedy '((?!!!).)+' for style, but non-greedy is
+        # easier to use and backwards compatible
+        expr          ::=  .+?
+        stopexpr      ::=  .+?
 
         # finals
         exprmode      ::=  ^ (?P<cast> {cast})? \|
                            (~ (?P<format> {format}) ::)?
-                           (?P<expr> {expr})?
+                           (?P<expr> {expr})
                            (@ (?P<stopexpr> {stopexpr}) )?
                            (?P<reverse> !)? $
 
@@ -256,6 +258,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
         # Read values
         EXPRMODE  = 'start' not in m
         ALPHA     = 'wrap' in m
+        REVERSE   = bool(m['reverse'])
         step      = int_or_float(m['step']) if 'step' in m and m['step'] else 1
         format    = m['format']
         expr      = not ALPHA and m['expr']
@@ -307,7 +310,10 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
                 break
 
             if EXPRMODE:
-                value = self.view.substr(selections[i])
+                # Because exprmode depends on the actual value of the (previous)
+                # selection we need to actually iterate the sels backwards
+                reg = selections[i] if not REVERSE else selections[-i - 1]
+                value = self.view.substr(reg)
                 # Try to cast the value to what was requested (str is default)
                 try:
                     value = self.casttable[cast](value)
@@ -321,7 +327,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
                     else:
                         sublime.error_message(
                             "[%s] Invalid Expression\n\n"
-                            "Selection `%s` could not be casted to '%s':\n\n"
+                            "Selection `%s` could not be cast to '%s':\n\n"
                             "%r" % (module_name, value, cast, e)
                         )
                         return
@@ -392,37 +398,43 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
                 else:
                     replace = str(eval_value)
 
-            values.append(replace if not skip else value)
+            values.append(replace if not skip else str(value))
 
             if not EXPRMODE:
                 value += step
             i += 1
             skip = False
 
-        # Insert the values into the regions (possibly in reversed order)
-        for i, region in enumerate(selections):
-            if i >= len(values):
-                if EXPRMODE:
-                    # If we have a stopexpr in exprmode just don't touch the
-                    # other selections at all
+        if EXPRMODE:
+            # Expr mode is different (in reverse mode especially)
+            if REVERSE:
+                selections = reversed(selections)
+            for i, region in enumerate(selections):
+                # If we have a stopexpr just don't touch the other selections
+                if i == len(values):
                     break
 
-                # print("More selections than values generated.")
-                # Start at 0, break or insert "" for the remaining?
-                text = ""
+                self.view.replace(edit, region, values[i])
+        else:
+            # Insert the values into the regions (possibly in reversed order)
+            for i, region in enumerate(selections):
+                if i >= len(values):
+                    # print("More selections than values generated.")
+                    # Start at 0, break or insert "" for the remaining?
+                    text = ""
 
-            elif i + 1 == len(selections) != len(values):
-                # Last selection and more than 1 values to go
-                other = (values[i:] if not m['reverse']
-                         else values[-i - 1::-1])  # splicesssss
-                text = "\n".join(map(str, other))
+                elif i + 1 == len(selections) != len(values):
+                    # Last selection and more than 1 values to go
+                    other = (values[i:] if not REVERSE
+                             else values[-i - 1::-1])  # splicesssss
+                    text = "\n".join(other)
 
-            else:
-                if m['reverse']:
-                    i = -i - 1
-                text = str(values[i])
+                else:
+                    if REVERSE:
+                        i = -i - 1
+                    text = values[i]
 
-            self.view.replace(edit, region, text)
+                self.view.replace(edit, region, text)
 
         # We're done
         if vid:
