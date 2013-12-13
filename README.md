@@ -404,8 +404,8 @@ And many more ...
 ## Contributors
 
 - [James Brooks](http://james.brooks.so), Twitter: [@jbrooksuk](https://twitter.com/jbrooksuk)
-- @FichteFoll, Twitter: [@FichteFoll](https://twitter.com/FichteFoll)
-- Marco Novaro, @MarcoNovaro
+- [@FichteFoll](https://github.com/FichteFoll), Twitter: [@FichteFoll](https://twitter.com/FichteFoll)
+- Marco Novaro, [@MarcoNovaro](https://github.com/MarcoNovaro)
 - Oleg Geier, Twitter: [@relikd](https://twitter.com/relikd)
 - Arthur Comben, Twitter: [@anthillape](https://twitter.com/anthillape)
 
