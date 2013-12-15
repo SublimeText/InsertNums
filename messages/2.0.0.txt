@@ -1,8 +1,8 @@
 Insert Nums has been rewritten completely!
 
-It is highly recommended that you read the updated README.md (Preferenecs >
-Insert Nums > README, or
-(https://github.com/jbrooksuk/InsertNums/blob/master/README.md) for a full
+It is highly recommended that you read the updated README.md ('Preferenecs >
+Insert Nums > README', or
+https://github.com/jbrooksuk/InsertNums/blob/master/README.md) for a full
 explanation on functionality. **Make sure to read the examples.**
 
 
