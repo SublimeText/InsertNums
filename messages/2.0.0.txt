@@ -18,6 +18,9 @@ Here is a list of the most notable changes:
 
 - An expression mode has been added which allows you modify the current value
   of a selection.
+  
+- A stop expr which you can use to generate an arbitrary amount of numbers,
+  separated by newlines.
 
 - The panel now previews your inputs live and removes them accordingly when
   you abort.
