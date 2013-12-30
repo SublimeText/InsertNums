@@ -8,7 +8,7 @@ class PromptInsertNumsCommand(sublime_plugin.WindowCommand):
             '1 1 0',
             self.insertNums,
             self.insertNums if automatic else None,
-            None
+            self.on_cancel
         )
         pass
 
@@ -24,6 +24,8 @@ class PromptInsertNumsCommand(sublime_plugin.WindowCommand):
         except ValueError:
             pass
 
+    def on_cancel(self):
+        self.window.run_command('undo')
 
 class InsertNumsCommand(sublime_plugin.TextCommand):
     alpha = 'abcdefghijklmnopqrstuvwxyz'
