@@ -35,7 +35,7 @@
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/Insert Nums/Default ($platform).sublime-keymap",
+                                    "file": "${packages}/Insert Nums/Default ($platform).sublime-keymap"
                                 },
                                 "caption": "Key Bindings – Default"
                             },
