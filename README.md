@@ -5,7 +5,7 @@
 
 ## Installation
 
-You can install InsertNums via [Package Control][pkgctrl] by searching for **Insert Nums**.
+You can install *Insert Nums* via [Package Control][pkgctrl] by searching for **Insert Nums**.
 
 Alternatively, you can download the Zip and copy it to your Sublime Text Packages folder, or use `git clone`.
 
@@ -15,7 +15,8 @@ Alternatively, you can download the Zip and copy it to your Sublime Text Package
 - **Windows** and **Linux**: <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd>
 - **OSX**: <kbd>⌘⌃N</kbd>
 
-An input panel opens which live-previews your current format string. If you close the panel (e.g. by pressing <kbd>Esc</kbd>), the changes will be undone.
+An input panel opens which live-previews your current format string. If you close the panel (e.g. by pressing <kbd>Esc</kbd>), the changes will be undone. 
+If you prefer to not have this live preview, you can disable it by also pressing the <kbd>Shift</kbd> key.
 
 Insert a string in the format `<start>:<step>` and press enter. Both can be omitted and default to `1` (meaning `1:1`).
 
@@ -25,7 +26,7 @@ For every selected region the inserted number (starting with *start*) will then 
 
 - **`prompt_insert_nums`**
 
-    Opens an input panel with live preview as explained above.
+    Opens an input panel with live preview as explained above. The parameter `preview` can specify if *Insert Nums* should show a live preview when editing the format string. Defaults to `true`.
 
 - **`insert_nums`**
 
@@ -33,7 +34,7 @@ For every selected region the inserted number (starting with *start*) will then 
 
 ### Usage with numbers
 
-InsertNums supports both, integers and floating numbers, as *start* and *step* values respectively, also negative numbers. This means you can use `1:.4` on 4 selections and get this:
+*Insert Nums* supports both, integers and floating numbers, as *start* and *step* values respectively, also negative numbers. This means you can use `1:.4` on 4 selections and get this:
 
     1.0
     1.4
@@ -46,7 +47,7 @@ See the [Advanced usage](#advaced-usage) section for information about using a s
 
 ### Usage with the alphabet
 
-InsertNums can also insert the alphabet. Just use `a` as *start* value, or change `a` to whatever character you'd like to start from. *step* only accepts integers because there are obviously no fractions of the characters in the alphabet.
+*Insert Nums* can also insert the alphabet. Just use `a` as *start* value, or change `a` to whatever character you'd like to start from. *step* only accepts integers because there are obviously no fractions of the characters in the alphabet.
 
 One of the side effects of introducing alpha sequences is that you can generate seemingly (but definitely not) random sequences. For instance, using `a:12345` will generate the following across three selections:
 
@@ -56,7 +57,7 @@ One of the side effects of introducing alpha sequences is that you can generate 
 
 All that's happening there is that the next letter in the sequence is shunted across by the step amount.
 
-If you'd rather like InsertNums to wrap when the last character (`z`) is reached, you can append `~w`. Thus, `a:12345~w` will generate this:
+If you'd rather like *Insert Nums* to wrap when the last character (`z`) is reached, you can append `~w`. Thus, `a:12345~w` will generate this:
 
     a
     v
@@ -127,7 +128,7 @@ Detailed syntax definition: [format_syntax.txt](format_syntax.txt)
 
 ### Advanced usage (Expression)
 
-In addition to the insert mode Insert Nums also specifies a way to **modify** the current selection(s). The syntax is as follows:
+In addition to the insert mode *Insert Nums* also specifies a way to **modify** the current selection(s). The syntax is as follows:
 
     [<cast>]|[~<format>::]<expr>[@<stopexpr>][!]
 
