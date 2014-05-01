@@ -170,7 +170,8 @@ class SelectionListener(sublime_plugin.EventListener):
         # from after the last insert_nums call. If yes, it has been modified
         # and could produce unexpectable results.
         if vid == view.id() and list(view.sel()) not in (initsel, lastsel):
-            status("Selection has been modified by third-party. Aborting.")
+            status("Selection has been modified by you or third-party. "
+                   "Aborting.")
             # For some reason this does NOT undo the change by insert_nums
             view.window().run_command("hide_panel", {"cancel": True})
 
@@ -192,9 +193,9 @@ class PromptInsertNumsCommand(sublime_plugin.TextCommand):
 
     def on_done(self, format):
         global vid
-
-        vid = 0
-        self.revert_changes()
+        if vid:  # Revert changes if previewed
+            vid = 0
+            self.revert_changes()
         self.view.run_command("insert_nums", {"format": format})
 
     def preview(self, format):
@@ -218,12 +219,12 @@ class PromptInsertNumsCommand(sublime_plugin.TextCommand):
             vid = 0
             initsel, lastsel = [], []
 
-    def run(self, edit):
+    def run(self, edit, preview=True):
         self.view.window().show_input_panel(
             "Enter a Format string (default: '1:1'):",
             '',
             self.on_done,  # on_done
-            self.preview,  # on_change
+            self.preview if preview else None,  # on_change
             self.cancel    # on_cancel
         )
 

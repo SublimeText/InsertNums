@@ -7,7 +7,7 @@
 		"caption": "InsertNums - No Preview",
 		"command": "prompt_insert_nums",
 		"args": {
-			"automatic": false
+			"preview": false
 		}
 	}
 ]
