@@ -1,0 +1,43 @@
+# insert_spec ::=  insertnum | insertalpha | exprmode
+
+exprmode      ::=  [cast] "|" [~format::] expr [@stopexpr] ["!"]
+cast          ::=  "i" | "f" | "s" | "b"
+
+insertnum     ::=  [signednum][:signednum][~format][::expr][@stopexpr] ["!"]
+
+signednum     ::=  ["+" | "-"] (integer | float)
+numeric       ::=  integer | float
+# The following are kinda "hacks" but i cba to do it correctly
+expr          ::=  <any character until the next match>+
+stop_expr     ::=  <any character until the next match>+
+
+# essentially Python's "str.format" syntax
+format        ::=  [[fill]align][sign][#][0][width][.precision][type]
+fill          ::=  <a character other than '}'>
+align         ::=  "<" | ">" | "=" | "^"
+sign          ::=  "+" | "-" | " "
+width         ::=  integer
+precision     ::=  integer
+type          ::=  "b" | "c" | "d" | "e" | "E" | "f" | "F" | "g" | "G" | "n" | "o" | "x" | "X" | "%"
+
+
+insertalpha   ::=  alphastart[:signedint][~[alphaformat] ["w"]][@stopexpr] ["!"]
+
+alphastart    ::=  alphalower+ | alphaupper+
+alphalower    ::=  "a"..."z"
+alphaupper    ::=  "A"..."Z"
+alphaformat   ::=  [[fill]align][width]
+
+####################
+
+signedint     ::=  ["+" | "-"] {integer}
+integer       ::=  nonzerodigit digit* | "0"
+nonzerodigit  ::=  "1"..."9"
+digit         ::=  "0"..."9"
+
+float         ::=  pointfloat | exponentfloat
+pointfloat    ::=  [intpart] fraction | intpart "."
+exponentfloat ::=  (intpart | pointfloat) exponent
+intpart       ::=  digit+
+fraction      ::=  "." digit+
+exponent      ::=  ("e" | "E") ["+" | "-"] digit+

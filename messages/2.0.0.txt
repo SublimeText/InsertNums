@@ -1,0 +1,23 @@
+Insert Nums has been rewritten completely!
+
+It is highly recommended that you read the updated README.md (Preferenecs >
+Insert Nums > README, or
+(https://github.com/jbrooksuk/InsertNums/blob/master/README.md) for a full
+explanation on functionality. **Make sure to read the examples.**
+
+
+Here is a list of the most notable changes:
+
+- An entirely new format syntax has been introduced that includes all previous
+  features and an infinite amount of new ones.
+  This essentially simplified the syntax for easy tasks and added options for
+  complex tasks too.
+
+- Python expression functionality has been added, modify numbers in any way
+  you please (e.g. binary bitflags).
+
+- An expression mode has been added which allows you modify the current value
+  of a selection.
+
+- The panel now previews your inputs live and removes them accordingly when
+  you abort.
