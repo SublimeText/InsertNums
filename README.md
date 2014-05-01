@@ -1,4 +1,4 @@
-# Sublime Text - Insert Nums
+# Sublime Text - Insert Nums [![Gittip](http://badgr.co/gittip/jbrooksuk.png)](https://www.gittip.com/jbrooksuk/)
 
 **Sublime Text 2 and 3** plugin, that inserts (consecutive) numbers across multiple selections or modifies the selections' contents with expressions. Huge configurability.
 
