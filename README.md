@@ -120,7 +120,7 @@ Detailed syntax definition: [format_syntax.txt](format_syntax.txt)
     This ignores the number of selections which means that you can also have more or less values than selections. Especially useful when generating numbers from a single selection.
 
     - If there is more selections than numbers generated when processing the stop expression, all the remaining selections' text will be deleted.
-    - If there is more numbers generated than selections, all further numbers are joing by newlines (`"\n"`) and added to the last selection made. This can be the first selection if there is only one.
+    - If there is more numbers generated than selections, all further numbers are joining by newlines (`"\n"`) and added to the last selection made. This can be the first selection if there is only one.
 
 - **reverse** (optional)
 
@@ -302,7 +302,7 @@ The `|` pipe is used to show the meaning of piping the current selection to the 
 
 ### Stop expressions
 
-**Note**: Assuming everything in *Before* has been seleted with one selection spanning each line.
+**Note**: Assuming everything in *Before* has been selected with one selection spanning each line.
 
 - Before:
 
@@ -347,7 +347,7 @@ The `|` pipe is used to show the meaning of piping the current selection to the 
 
 ### Expression mode
 
-**Note**: Assuming everything in *Before* has been seleted with one selection spanning each line.
+**Note**: Assuming everything in *Before* has been selected with one selection spanning each line.
 
 - Before:
 
