@@ -4,7 +4,7 @@
         "children":
         [
             {
-                "caption": "InsertNums",
+                "caption": "Insert Nums",
                 "mnemonic": "N",
                 "command": "prompt_insert_nums"
             }
