@@ -12,8 +12,8 @@ Alternatively, you can download the Zip and copy it to your Sublime Text Package
 
 ## Usage
 
-- **Windows** and **Linux**: <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>N</kbd>
-- **OSX**: <kbd>⌘⌃N</kbd>
+- **Windows** and **Linux**: <kbd>Ctrl+Alt+N</kbd>
+- **OSX**: <kbd>⌘+⎇+N</kbd>
 
 An input panel opens which live-previews your current format string. If you close the panel (e.g. by pressing <kbd>Esc</kbd>), the changes will be undone. 
 If you prefer to not have this live preview, you can disable it by also pressing the <kbd>Shift</kbd> key.
