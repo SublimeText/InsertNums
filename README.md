@@ -1,14 +1,12 @@
-# Sublime Text - Insert Nums [![Gittip](http://badgr.co/gittip/jbrooksuk.png)](https://www.gittip.com/jbrooksuk/)
+# Insert Nums for Sublime Text 2 and 3.
 
-**Sublime Text 2 and 3** plugin, that inserts (consecutive) numbers across multiple selections or modifies the selections' contents with expressions. Huge configurability.
-
+A **Sublime Text 2 and 3** plugin, that inserts (consecutive) numbers across multiple selections or modifies the selections' contents with expressions. Huge configurability.
 
 ## Installation
 
 You can install *Insert Nums* via [Package Control][pkgctrl] by searching for **Insert Nums**.
 
 Alternatively, you can download the Zip and copy it to your Sublime Text Packages folder, or use `git clone`.
-
 
 ## Usage
 
@@ -401,7 +399,6 @@ The `|` pipe is used to show the meaning of piping the current selection to the 
 
 And many more ...
 
-
 ## Contributors
 
 - [James Brooks](http://james.brooks.so), Twitter: [@jbrooksuk](https://twitter.com/jbrooksuk)
@@ -410,11 +407,9 @@ And many more ...
 - Oleg Geier, Twitter: [@relikd](https://twitter.com/relikd)
 - Arthur Comben, Twitter: [@anthillape](https://twitter.com/anthillape)
 
-
 # License
 
 MIT - <http://jbrooksuk.mit-license.org>
-
 
 [pkgctrl]: http://wbond.net/sublime_packages/package_control
 [decimalinteger]: http://docs.python.org/2.6/reference/lexical_analysis.html#grammar-token-decimalinteger
