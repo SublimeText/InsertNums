@@ -4,6 +4,7 @@ import time
 # Modules for expression evaluation
 import math
 import random
+import itertools
 
 import sublime
 import sublime_plugin
@@ -339,7 +340,7 @@ class InsertNumsCommand(sublime_plugin.TextCommand):
                     env = dict(
                         _=value, i=i, p=eval_value, s=step, n=len(selections),
                         # Modules
-                        math=math, random=random, re=re
+                        math=math, random=random, re=re, itertools=itertools
                     )
                     if EXPRMODE:
                         del env['s']  # We don't need the step here
