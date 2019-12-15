@@ -105,7 +105,7 @@ Detailed syntax definition: [format_syntax.txt](format_syntax.txt)
         - `i`: Just an integer holding the counter for the iteration; starts at `0` and is increased by `1` in every loop
         - `_`: The current value before the expression (`start + i * step`)
         - `p`: The result of the previously evaluated value (without formatting); `0` for the first value
-        - `math`, `random` and `re`: Useful modules that are pre-imported for you
+        - `math`, `random`, `re` and `itertools`: Useful modules that are pre-imported for you
 
         *Note*: The return value does not have to be a number type, you can also generate strings, tuples or booleans.
 
@@ -271,6 +271,20 @@ The `|` pipe is used to show the meaning of piping the current selection to the 
     25
     36
     ```
+    
+- `::list(itertools.product(['a', 'b', 'c'], ['x', 'y', 'z']))[i]`
+
+    ```
+    ('a', 'x')
+    ('a', 'y')
+    ('a', 'z')
+    ('b', 'x')
+    ('b', 'y')
+    ('b', 'z')
+    ('c', 'x')
+    ('c', 'y')
+    ('c', 'z')
+    ```
 
 ### Alpha insert
 
@@ -406,6 +420,7 @@ And many more ...
 - Marco Novaro, [@MarcoNovaro](https://github.com/MarcoNovaro)
 - Oleg Geier, Twitter: [@relikd](https://twitter.com/relikd)
 - Arthur Comben, Twitter: [@anthillape](https://twitter.com/anthillape)
+- [@logworthy](https://github.com/logworthy)
 
 # License
 
