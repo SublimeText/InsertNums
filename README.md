@@ -415,7 +415,7 @@ And many more ...
 
 ## Contributors
 
-- [James Brooks](http://james.brooks.so), Twitter: [@jbrooksuk](https://twitter.com/jbrooksuk)
+- [James Brooks](http://pinkary.com/@jbrooksuk), Twitter: [@jbrooksuk](https://twitter.com/jbrooksuk)
 - [@FichteFoll](https://github.com/FichteFoll), Twitter: [@FichteFoll](https://twitter.com/FichteFoll)
 - Marco Novaro, [@MarcoNovaro](https://github.com/MarcoNovaro)
 - Oleg Geier, Twitter: [@relikd](https://twitter.com/relikd)
