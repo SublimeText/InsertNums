@@ -1,12 +1,49 @@
-# Insert Nums for Sublime Text 2 and 3.
+# Insert Nums
 
-A **Sublime Text 2 and 3** plugin, that inserts (consecutive) numbers across multiple selections or modifies the selections' contents with expressions. Huge configurability.
+A [Sublime Text](https://www.sublimetext.com) plugin, 
+to insert (consecutive) numbers across multiple selections 
+or modifiy selections' contents 
+with expressions using sophisticated expressions syntax.
 
 ## Installation
 
-You can install *Insert Nums* via [Package Control][pkgctrl] by searching for **Insert Nums**.
+### Package Control
 
-Alternatively, you can download the Zip and copy it to your Sublime Text Packages folder, or use `git clone`.
+The easiest way to install is using [Package Control](https://packagecontrol.io). It's listed as `Insert Nums`.
+
+1. Open `Command Palette` using <kbd>ctrl+shift+P</kbd> or menu item `Tools → Command Palette...`
+2. Choose `Package Control: Install Package`
+3. Find `Insert Nums` and hit <kbd>Enter</kbd>
+
+### Manual Setup
+
+Alternatively, you can clone this repository into Sublime Text's Packages folder.
+
+> [!NOTE]
+>
+> To find _Packages_ folder call _Menu > Preferences > Browse Packages.._
+
+#### OSX
+
+```sh
+#!/usr/bin/env bash
+cd ~/Library/Application\ Support/Sublime\ Text/Packages/
+git clone https://github.com/SublimeText/InsertNums "Insert Nums"
+```
+
+#### Linux
+
+```sh
+cd ~/.config/sublime-text/Packages
+git clone https://github.com/SublimeText/InsertNums "Insert Nums"
+```
+
+#### Windows
+
+```dos
+cd "%APPDATA%\Sublime Text\Packages"
+git clone https://github.com/SublimeText/InsertNums "Insert Nums"
+```
 
 ## Usage
 
