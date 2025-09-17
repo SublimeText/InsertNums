@@ -117,7 +117,7 @@ Detailed syntax definition: [format_syntax.txt](format_syntax.txt)
 
 - **start**
 
-    + *with numbers* (optional): A [decimalinteger] or [floatnumber] according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
+    + *with numbers* (optional): A [decimalinteger][] or [floatnumber][] according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
 
     + *with alphabet* (required): A sequence of either lower- or uppercase ASCII characters from the alphabet (`a` to `z` and `A` to `Z`).
 
