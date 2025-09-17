@@ -123,7 +123,7 @@ Detailed syntax definition: [format_syntax.txt](format_syntax.txt)
 
 - **step** (optional)
 
-    + *with numbers*: A [decimalinteger] or [floatnumber] according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
+    + *with numbers*: A [decimalinteger][] or [floatnumber][] according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
 
     + *with alphabet*: A [decimalinteger] with an optional leading sign (`-` or `+`).
 
