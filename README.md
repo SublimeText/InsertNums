@@ -117,15 +117,15 @@ Detailed syntax definition: [format_syntax.txt](format_syntax.txt)
 
 - **start**
 
-    + *with numbers* (optional): A [*[decimalinteger]*][decimalinteger] or [*[floatnumber]*][floatnumber] according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
+    + *with numbers* (optional): A [decimalinteger][] or [floatnumber][] according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
 
     + *with alphabet* (required): A sequence of either lower- or uppercase ASCII characters from the alphabet (`a` to `z` and `A` to `Z`).
 
 - **step** (optional)
 
-    + *with numbers*: A [*[decimalinteger]*][decimalinteger] or [*[floatnumber]*][floatnumber] according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
+    + *with numbers*: A [decimalinteger][] or [floatnumber][] according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
 
-    + *with alphabet*: A [*[decimalinteger]*][decimalinteger] with an optional leading sign (`-` or `+`).
+    + *with alphabet*: A [decimalinteger][] with an optional leading sign (`-` or `+`).
 
 - **format** (optional)
 
@@ -452,7 +452,7 @@ And many more ...
 
 ## Contributors
 
-- [James Brooks](http://pinkary.com/@jbrooksuk), Twitter: [@jbrooksuk](https://twitter.com/jbrooksuk)
+- [James Brooks](https://pinkary.com/@jbrooksuk), Twitter: [@jbrooksuk](https://twitter.com/jbrooksuk)
 - [@FichteFoll](https://github.com/FichteFoll), Twitter: [@FichteFoll](https://twitter.com/FichteFoll)
 - Marco Novaro, [@MarcoNovaro](https://github.com/MarcoNovaro)
 - Oleg Geier, Twitter: [@relikd](https://twitter.com/relikd)
@@ -461,9 +461,8 @@ And many more ...
 
 # License
 
-MIT - <http://jbrooksuk.mit-license.org>
+MIT - <https://jbrooksuk.mit-license.org>
 
-[pkgctrl]: http://wbond.net/sublime_packages/package_control
-[decimalinteger]: http://docs.python.org/2.6/reference/lexical_analysis.html#grammar-token-decimalinteger
-[floatnumber]: http://docs.python.org/2.6/reference/lexical_analysis.html#grammar-token-floatnumber
-[fmtlang]: http://docs.python.org/2.6/library/string.html#format-specification-mini-language
+[decimalinteger]: https://docs.python.org/2.6/reference/lexical_analysis.html#grammar-token-decimalinteger
+[floatnumber]: https://docs.python.org/2.6/reference/lexical_analysis.html#grammar-token-floatnumber
+[fmtlang]: https://docs.python.org/2.6/library/string.html#format-specification-mini-language
