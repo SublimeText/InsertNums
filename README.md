@@ -125,7 +125,7 @@ Detailed syntax definition: [format_syntax.txt](format_syntax.txt)
 
     + *with numbers*: A [decimalinteger][] or [floatnumber][] according to Python's syntax specifications with an optional leading sign (`-` or `+`). Default: `1`
 
-    + *with alphabet*: A [decimalinteger] with an optional leading sign (`-` or `+`).
+    + *with alphabet*: A [decimalinteger][] with an optional leading sign (`-` or `+`).
 
 - **format** (optional)
 
